@@ -1,0 +1,130 @@
+swagger: "2.0"
+
+info:
+  version: "0.1"
+  title: "Loktar"
+
+basePath: /v1
+
+paths:
+  /init/{scm_provider}:
+      post:
+        tags:
+          - loktar_api
+        summary: Receive a github payload.
+        description: ""
+        operationId: loktar_api.api.init
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: path
+            name: scm_provider
+            required: true
+            type: string
+          - in: body
+            name: payload
+            description: init payload.
+            schema:
+              $ref: "#/definitions/Init"
+        responses:
+          "201":
+            description: Created
+            schema:
+              $ref: "#/definitions/InfoJob"
+          "400":
+            description: Invalid request
+          "503":
+            description: Service unavailable
+  /jobs:
+      get:
+        tags:
+          - loktar_api
+        summary: Get a list of jobs.
+        description: ""
+        operationId: loktar_api.api.get_jobs
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        responses:
+          "200":
+            description: Ok
+            schema:
+              $ref: "#/definitions/InfoJobs"
+          "400":
+            description: Invalid request
+          "503":
+            description: Service unavailable
+  /jobs/{id}:
+      get:
+        tags:
+          - loktar_api
+        summary: Get a loktar_api job.
+        description: ""
+        operationId: loktar_api.api.get_job
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: path
+            name: id
+            description: ID of the loktar_api job.
+            required: true
+            type: string
+        responses:
+          "200":
+            description: Ok
+            schema:
+              $ref: "#/definitions/InfoJob"
+          "404":
+            description: Not found
+          "503":
+            description: Service unavailable
+
+definitions:
+  Init:
+    type: object
+    properties:
+      git_branch:
+          description: "The git branch for launch the job"
+          example: ""
+          readOnly: false
+          type: string
+      commit_id:
+          description: "The commit id to send informations"
+          example: ""
+          readOnly: false
+          type: string
+      commit_message:
+          description: "The commit message"
+          example: ""
+          readOnly: false
+          type: string
+      committer:
+          description: "The committer"
+          example: ""
+          readOnly: false
+          type: string
+      rebuild:
+          description: "Particular case default false"
+          example: false
+          readOnly: false
+          type: boolean
+  InfoJob:
+    type: object
+    properties:
+      id:
+          description: "ID Job"
+          example: "9314900b-0d99-468a-9b39-2c07d57ad2ea"
+          readOnly: false
+          type: string
+  InfoJobs:
+    type: object
+    properties:
+      jobs:
+        type: array
+        items:
+          $ref: "#/definitions/InfoJob"
