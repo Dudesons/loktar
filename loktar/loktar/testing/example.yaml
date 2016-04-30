@@ -1,3 +1,1 @@
-toto:
-  titi: 0
-  ttu: 2
+command: "ls /tmp"

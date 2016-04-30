@@ -2,8 +2,8 @@ from loktar.testing.plugin import ComplexPlugin
 
 
 class Example(ComplexPlugin):
-    def __init__(self):
-        ComplexPlugin.__init__(self, __file__.split(".")[0])
+    def __init__(self, package_info):
+        ComplexPlugin.__init__(self, package_info)
         self.timeline = {
             0: self.check_requirements,
             80: self.parse
@@ -19,5 +19,5 @@ class Example(ComplexPlugin):
         print 'tutu'
 
 if __name__ == "__main__":
-    test = Example()
+    test = Example({'pkg_name': 'toto'})
     test.run()
