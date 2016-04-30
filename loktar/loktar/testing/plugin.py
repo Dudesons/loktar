@@ -1,5 +1,6 @@
 from fabric.api import lcd
 from fabric.api import settings
+import sys
 import yaml
 
 from loktar.cmd import exe
@@ -11,9 +12,10 @@ from loktar.log import Log
 
 
 class SimplePlugin(object):
-    def __init__(self, plugin_name, package_info):
+    def __init__(self, package_info):
+        self.plugin_name = str(sys.modules[self.__class__.__module__].__file__).split(".")[0]
         self.logger = Log()
-        self.config = yaml.load(open("{0}.yaml".format(plugin_name)).read())
+        self.config = yaml.load(open("{0}.yaml".format(self.plugin_name)).read())
 
         self.path = "{0}/{1}/{2}".format(ROOT_PATH["container"],
                                          package_info["pkg_dir"],
@@ -31,15 +33,14 @@ class SimplePlugin(object):
         with lcd(self.path):
             with settings(warn_only=True):
                 result = exe(self.cmd, remote=False)
-
-                if result.failed:
+                if not result:
                     self.logger.error(result)
                     raise CITestFail('Test failed: {0}'.format(result))
 
 
 class ComplexPlugin(SimplePlugin):
-    def __init__(self, plugin_name, package_info):
-        SimplePlugin.__init__(self, plugin_name, package_info)
+    def __init__(self, package_info):
+        SimplePlugin.__init__(self, package_info)
         self.timeline = dict()
         self.__origin = {
             50: self._base_run
