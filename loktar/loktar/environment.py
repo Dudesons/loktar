@@ -36,8 +36,8 @@ GITHUB_INFO = {
                              "The build succeded! You're not so bad after all"),
         "error": os.getenv("{0}GITHUB_INFO_NOTIFICATION_ERROR".format(PREFIX_ENV_VAR),
                            "Error! I won't lie, you're really bad"),
-        "faillure": os.getenv("{0}GITHUB_INFO_NOTIFICATION_FAILLURE".format(PREFIX_ENV_VAR),
-                              "Failure. Nobody is happy."),
+        "failure": os.getenv("{0}GITHUB_INFO_NOTIFICATION_FAILLURE".format(PREFIX_ENV_VAR),
+                             "Failure. Nobody is happy."),
         "unknown": os.getenv("{0}GITHUB_INFO_NOTIFICATION_UNKNOWN".format(PREFIX_ENV_VAR),
                              "Unknown state, so 42.")
     },
@@ -56,8 +56,8 @@ GITHUB_API_COMMITS = {
 }
 CONFIG_CI_FILE = os.getenv("{0}CONFIG_CI_FILE".format(PREFIX_ENV_VAR), "config.json")
 DOCKER_ENGINE = {
-    "address": os.getenv("{0}DOCKER_CI_ADDRESS", None),
-    "port": os.getenv("{0}DOCKER_CI_PORT", None),
+    "address": os.getenv("{0}DOCKER_CI_ADDRESS", "127.0.0.1"),
+    "port": os.getenv("{0}DOCKER_CI_PORT", 2375),
     "registry_url": os.getenv("{0}DOCKER_CI_REGISTRY", None)
 }
 DOCKER_CI = {
