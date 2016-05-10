@@ -45,5 +45,11 @@ class FailDrawDepGraph(Exception):
 class ForbiddenTimelineKey(Exception):
     """Exception raised by conflict key in complex plugin"""
 
+
 class SimplePluginErrorConfiguration(Exception):
     """Exception raised by configuration error in simple plugin"""
+
+
+class ImportPluginError(Exception):
+    """Exception raised by if the plugin doesn't exist"""
+
