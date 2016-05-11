@@ -9,14 +9,17 @@ for hdlr in app.app.logger.handlers:  # remove all old handlers
 
 # Set handler
 handler = logging.StreamHandler()
-log_formatter = logging.Formatter("[%(levelname)s] [%(filename)s] [%(asctime)s] %(message)s")
+log_formatter = logging.Formatter("[%(levelname)s] [(filename)s] [%(asctime)s] %(message)s")
 handler.setFormatter(log_formatter)
-handler.setLevel(logging.INFO)
+handler.setLevel(logging.DEBUG)
+# handler.setLevel(logging.INFO)
 app.app.logger.addHandler(handler)
-app.app.logger.setLevel(logging.INFO)
+app.app.logger.setLevel(logging.DEBUG)
+# app.app.logger.setLevel(logging.INFO)
 
 logger = logging.getLogger()
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
+# logger.setLevel(logging.INFO)
 handler.setFormatter(log_formatter)
 logger.addHandler(handler)
 
