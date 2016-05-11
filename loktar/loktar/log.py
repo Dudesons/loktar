@@ -9,16 +9,16 @@ class Log(object):
             "error": "\033[91m",
             "end": "\033[0m",
         }
-    
+
     def info(self, msg):
         self._print_console(msg, "info")
-    
+
     def error(self, msg):
         self._print_console(msg, "error")
-    
+
     def warning(self, msg):
         self._print_console(msg, "warning")
-    
+
     def _print_console(self, msg, log_level):
         """Print a regular message to console"""
         if log_level == 'info':

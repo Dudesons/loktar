@@ -4,8 +4,10 @@ import pickle
 
 def serialize(item):
     """Serialize an item
+
     Args:
         item (object): Python object
+
     Returns:
         str: The item serialized as a string
     """
@@ -14,8 +16,10 @@ def serialize(item):
 
 def unserialize(item):
     """Unserialize an item
+
     Args:
         item (str): String to decode
+
     Returns:
         object: Python object
     """

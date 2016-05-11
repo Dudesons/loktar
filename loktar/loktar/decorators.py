@@ -46,9 +46,9 @@ def retry(call):
 
                 last_exception = exc
                 logger.info('Got an exception: {0}. Slept ({1} seconds / {2} seconds)'
-                              .format(exc,
-                                      total_sleep_time,
-                                      max_sleep_time))
+                            .format(exc,
+                                    total_sleep_time,
+                                    max_sleep_time))
         logger.info('Max sleep time exceeded, raising exception.')
         raise last_exception
 

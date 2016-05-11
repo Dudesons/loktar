@@ -86,7 +86,8 @@ PUSH_PACKAGE = {
     "debian": os.getenv("{0}PUSH_PACKAGE_DEBIAN".format(PREFIX_ENV_VAR),
                         "deb-s3 upload -p -b {0} -c {1} -m {2} -v public -a amd64 *.deb"
                         .format(DEBIAN_REPOSITORY, CODE_NAME, COMPENANT)),
-    "docker": os.getenv("{0}PUSH_PACKAGE_DOCKER".format(PREFIX_ENV_VAR), "docker push {0}".format(DOCKER_ENGINE["registry_url"]))
+    "docker": os.getenv("{0}PUSH_PACKAGE_DOCKER".format(PREFIX_ENV_VAR),
+                        "docker push {0}".format(DOCKER_ENGINE["registry_url"]))
 }
 
 JENKINS = {
@@ -96,7 +97,7 @@ JENKINS = {
 }
 
 SLAVE_ENVIRONMENT = {
-    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:{0}/.local/bin".format(ROOT_PATH["container"]),
+    "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:{0}/.local/bin"
+            .format(ROOT_PATH["container"]),
     "env_file": os.getenv("{0}ENV_FILE".format(PREFIX_ENV_VAR), None)
 }
-

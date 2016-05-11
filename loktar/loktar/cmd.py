@@ -23,9 +23,11 @@ def exec_command_with_retry(cmd, remote, max_retry):
 
 def exe(cmd, remote=True):
     """Execute a command
+
     Args:
         cmd (str): Command to execute
         remote (bool): Give the context execution remote (True) or local (False)
+
     Returns:
         bool: True if everything went well, False otherwise
     """

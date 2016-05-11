@@ -11,13 +11,13 @@ from jenkinsapi.custom_exceptions import NotBuiltYet
 from jenkinsapi.jenkins import Jenkins
 from requests import HTTPError
 
-from loktar.log import Log
-from loktar.serialize import serialize
 from loktar.environment import GITHUB_INFO
 from loktar.environment import JENKINS_PROTOCOL
 from loktar.exceptions import CIJobFail
+from loktar.log import Log
 from loktar.notifications import define_job_status_on_github_commit
 from loktar.scm import Github
+from loktar.serialize import serialize
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,7 @@ log = Log()
 
 def ci_downstream(ci_config, pkg_name, type_task, params, job_format="{0} - {1}"):
     """Send a job to the ci
+
     Args:
         ci_config: part of the config.json file under the ``'jenkins'`` key
         pkg_name: name of the package to build
@@ -47,6 +48,7 @@ def job_manager(ci_config,
                 committer,
                 test_env_path):
     """Build all the levels for a component
+
     Args:
         ci_config: part of the config.json file under the ``'jenkins'`` key
         component: a list of loktar.dependency levels. Example:
@@ -93,9 +95,11 @@ def job_manager(ci_config,
 
 def split_on_condition(seq, condition):
     """Split an iterator on a condition
+
     Args:
         seq (iterator): Iterator to process
         condition (function): Function representing the condition
+
     Returns:
         tuple of list: first element is a list of elements for which ``condition`` is True, the second element is a list
         for which ``condition`` is False.
@@ -108,8 +112,10 @@ def split_on_condition(seq, condition):
 
 def is_good(build):
     """Since jenkinsapi.Build.is_good is not good enough, I'm writing this one
+
     Args:
         build: instance of jenkinsapi.Build
+
     Returns:
         a boolean True or False
     """
@@ -130,6 +136,7 @@ def launch_jobs(jenkins_instance,
                 test_env_path):
 
     """Launch the jobs defined through the loktar.dependency graph
+
     Args:
         jenkins_instance: instance of the jenkins class
         commit_id: commit_id
@@ -204,6 +211,7 @@ def launch_jobs(jenkins_instance,
 
 def stop_all_jobs(launched_queues, queue_instance, running_builds):
     """Stop all jobs in queue or in the build pipe
+
     Args:
         launched_queues (list): list of queue items
         queue_instance (instance of jenkins.queues.Queue): instance of a Queue
@@ -225,6 +233,7 @@ def launch_queue(jenkins_instance,
                  type_build,
                  test_env_path):
     """Launch a CI queue
+
     Returns:
         jenkinsapi.queue.QueueItem: QueueItem instance
     """
@@ -251,6 +260,7 @@ def get_job_params(commit_id,
                    type_build,
                    test_env_path):
     """Build the parameters to send to Jenkins jobs
+
     Args:
         commit_id:
         committer:
@@ -258,6 +268,7 @@ def get_job_params(commit_id,
         git_branch:
         type_build:
         test_env_path:
+
     Returns:
     """
     composition_parameters = ('{0}:@:{1}'
@@ -289,9 +300,11 @@ def get_job_params(commit_id,
 
 def build_params_to_context(package, type_build):
     """Output a status message describing the build
+
     Args:
         package (str): Package being built
         type_build (str): type of build
+
     Returns:
         str: Message to use in Github status.
     """
@@ -301,10 +314,13 @@ def build_params_to_context(package, type_build):
 
 def context_to_build_params(context):
     """Parse a Github status into the build parameters
+
     Args:
         context (basicstring): Github status message.
+
     Returns:
         package, type_build
+
     Raises:
         ValueError: Could not decode context
     """

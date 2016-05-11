@@ -1,6 +1,6 @@
+import os
 import pickle
 import redis
-import os
 
 
 class Job(object):
@@ -14,6 +14,7 @@ class Job(object):
 
     def set_job(self, job_id, job_payload):
         """Save job information in a db
+
         Args:
             job_id (str): the id of the current job
             job_payload (dict): the payload of the job who is store in the db
@@ -25,6 +26,7 @@ class Job(object):
 
     def get_job(self, job_id):
         """Get a specific job payload
+
         Args:
             job_id (str): the id of the current job
 

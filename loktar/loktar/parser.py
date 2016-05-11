@@ -1,11 +1,15 @@
 from loktar.job import context_to_build_params
 
+
 def parse_statuses(statuses):
     """Parse a list of statuses
+
     Some packages can be simulteneouly in green builds and red builds, if they were built with
     more than one different build type.
+
     Args:
         statuses (iterator of github.CommitStatus.CommitStatus): List of commit statuses
+
     Returns:
         a tuple of sets: green_builds, red_builds
     """

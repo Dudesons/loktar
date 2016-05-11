@@ -52,4 +52,3 @@ class SimplePluginErrorConfiguration(Exception):
 
 class ImportPluginError(Exception):
     """Exception raised by if the plugin doesn't exist"""
-

@@ -6,27 +6,29 @@ import json
 import networkx as nx
 import numpy as np
 import os
-import time
 import re
+import time
 import urllib
 
+from loktar.decorators import retry
 from loktar.environment import GITHUB_INFO
 from loktar.environment import GITHUB_TOKEN
 from loktar.exceptions import CIJobFail
 from loktar.exceptions import FailDrawDepGraph
-from loktar.decorators import retry
 from loktar.log import Log
 from loktar.parser import parse_statuses
-from loktar.scm import Github
 from loktar.scm import fetch_github_file
+from loktar.scm import Github
 
 logger = Log()
 
 
 def docker_deps(basepath):
     """Get docker image dependencies.
+
     Args:
         basepath (str): Path to the package
+
     Returns:
         set: Dependencies names.
     """
@@ -50,8 +52,10 @@ def docker_deps(basepath):
 
 def python_deps(basepath):
     """Get python dependencies from requirements.txt and test_requirements.txt.
+
     Args:
         basepath (str): Path to the package
+
     Returns:
         set: Requirements names.
     """
@@ -73,8 +77,10 @@ def python_deps(basepath):
 
 def deps(basepath):
     """Gather all dependencies for this package
+
     Args:
         basepath (str): Path to the package
+
     Returns:
         set: Dependencies names.
     """
@@ -83,26 +89,32 @@ def deps(basepath):
 
 def get_excluded_deps(packages, dict_message_files, modified_packages):
     """Compute which package's dependencies should be ignored based on commit messages.
+
     This does not take into account modified dependencies of an package whose dependencies are excluded.
     We only need to know if an packages non-modified dependencies should be ignored or not, the rest is
     done in ``dependency_graph_from_modified_packages``.
+
     Args:
         packages (dict): all packages. Keys are packages names, values are directly taken from config.json
         dict_message_files (dict of str: list): Comments of the commits linked to the pull request are keys,
             modified files are values. If empty, the returned set is empty.
         modified_packages (set of str): names of the packages that were modified
+
     Returns:
         set of str: items are packages names whose dependencies must not be added to the dependency graph
+
     Examples:
         >>> get_excluded_deps({'package': {'exclude_dependencies_only_on_keywords': ['CLN', 'BLD']}},
         ... {'CLN/BLD: Cleaned some files. I do not care about dependencies': 'package/modified.py'},
         ... {'package'})
         {'package'}
+
         >>> get_excluded_deps({'package': {'exclude_dependencies_only_on_keywords': ['CLN', 'BLD']}},
         ... {'BUG: Fixed a serious bug! This should rebuild dependencies': 'package/modified.py'},
         ... {})
         {'package'}
     """
+
     if not dict_message_files:
         return set()
 
@@ -129,9 +141,11 @@ def get_excluded_deps(packages, dict_message_files, modified_packages):
 
 def package_from_path(path, packages):
     """Get the name of an package from a path.
+
     Args:
         path: relative path starting with the potential package name (Example: serializers/http/)
         packages (dict): all packages. Keys are packages names, values are directly taken from config.json
+
     Returns:
         the package name or None if the path is not inside an package
     """
@@ -144,8 +158,10 @@ def package_from_path(path, packages):
 
 def package_path(package):
     """Get the path of a package
+
     Args:
         package (dict): Package configuration
+
     Returns:
         str: The package path relative to the repository root.
     """
@@ -157,10 +173,12 @@ def package_path(package):
 
 def graph_edges(packages_requirements, modified_packages, exclude_dep_from_packages):
         """Recursively find graph edges
+
         Args:
             packages_requirements (dict of list): Dictionary of package_name: requirements
             modified_packages (set): Package names that are considered modified
             exclude_dep_from_packages (set): Do not analyze the dependencies for the packages in this list
+
         Returns:
             list of tuple: Graph edges between packages.
         """
@@ -197,12 +215,14 @@ def dependency_graph_from_modified_packages(repo_path,
                                             modified_packages,
                                             exclude_dep_from_packages=None):
     """Parse requirement with a pattern for generating a dependencies graph
+
     Args:
         repo_path (str): this is the path where the repo to parse is
         packages (dict): all packages. Keys are packages names, values are directly taken from config.json
         modified_packages (set): This is a set a modified package
         exclude_dep_from_packages (Optional[set]): Do not analyze the dependencies for the packages in this list.
             Defaults to None.
+
     Returns:
         networkx.classes.digraph.DiGraph: The dependency graph.
     """
@@ -228,6 +248,7 @@ def dependency_graph_from_modified_packages(repo_path,
 
 def get_package_requirements(package_name, packages, repo_path, restrict_requirements_types=None):
     """Get the requirements of a package
+
     Args:
         package_name (str): Name of the package to consider
         packages (dict): All packages. Keys are packages names, values are directly taken from config.json
@@ -255,8 +276,10 @@ def get_package_requirements(package_name, packages, repo_path, restrict_require
 
 def output_levels(graph):
     """Generate relationship level dependencies with a directed graph
+
     Args:
         graph (networkx.classes.digraph.DiGraph): Represent a directed graph
+
     Return:
         Return a list of dependencies level, top level to the lower level
     """
@@ -267,7 +290,8 @@ def output_levels(graph):
     for level, node in enumerate(top_sort):
         potential_level = level
         # While we are not connected to this level we push the package down a level
-        while all((level_node, node) not in graph.edges() for level_node in levels[potential_level]) and potential_level >= 0:
+        while all((level_node, node) not in graph.edges() for level_node in levels[potential_level]) \
+                and potential_level >= 0:
             potential_level -= 1
 
         # Potential_level is now below the one where the node should go (where we are not connected)
@@ -279,8 +303,10 @@ def output_levels(graph):
 
 def get_directed_components(graph):
     """Generate a list a directed graph
+
     Args:
         graph (networkx.classes.digraph.DiGraph): Represent a directed graph
+
     Returns:
         List of networkx.classes.digraph.DiGraph
     """
@@ -291,9 +317,11 @@ def get_directed_components(graph):
 
 def dependencies_layout(dependencies_levels, scale=1):
     """Generate a layout for the dependencies graph
+
     Args:
         dependencies_levels: A list of list with dependencies levels
         scale (float): Scale factor for positions
+
     Returns:
         dict: A dictionary of positions keyed by node
     """
@@ -311,7 +339,8 @@ def dependencies_layout(dependencies_levels, scale=1):
         for level_i, level in enumerate(component):
             nodes.extend(level)
             pos_packages_x = np.concatenate((pos_packages_x, np.zeros(len(level)) + level_i * scale))
-            pos_packages_y = np.concatenate((pos_packages_y, np.linspace(0, scale * len(level), len(level)) - scale * len(level) / 2.))
+            pos_packages_y = np.concatenate((pos_packages_y,
+                                             np.linspace(0, scale * len(level), len(level)) - scale * len(level) / 2.))
         # We put this component on top of the previous one, adding a 'scale' margin
         pos_packages_y += 3 * scale + component_top
         # We update the total height
@@ -329,6 +358,7 @@ def dependencies_layout(dependencies_levels, scale=1):
 
 def gplot(graph, dependencies_levels, save_path=None, output_type=None):
     """Draw a the dependency graph
+
     Args:
         graph (networkx.classes.digraph.DiGraph): Represent a directed graph
         dependencies_levels: A list of list with dependencies levels
@@ -367,9 +397,11 @@ def gplot(graph, dependencies_levels, save_path=None, output_type=None):
 
 def gen_dependencies_level(directed_graph, draw=False):
     """Generate dependencies levels
+
     Args:
         directed_graph (networkx.classes.digraph.DiGraph): Graph that represents relationship dependencies
         draw (Boolean): of the function generate an image of dependencies level
+
     Returns:
         a tuple of
           - a boolean: True or False
@@ -401,17 +433,21 @@ def gen_dependencies_level(directed_graph, draw=False):
 
 def get_do_not_touch_packages(id_pr, packages, scm, dep_graph, rebuild=False):
     """Get packages that should not be touched (except if one of their dependencies was modified)
+
     These are packages which have only green builds, that were not modified in the last commits, and whose
     relationships between each other involve _only_ themselves.
+
     Args:
         id_pr: ID of the pull request
         packages (dict): all packages. Keys are packages names, values are directly taken from config.json
         scm (loktar_api.scm.Github): Internal Github instance
         dep_graph (networkx.classes.digraph.DiGraph): Graph that represents relationships between dependencies
-        exclude_head (bool): If True (default), skip the head commit
+        rebuild (bool): If True (default), skip the head commit
+
     Returns:
         set: Set of packages that should not be touched
     """
+
     if rebuild:  # If rebuild is True, we only consider the last commit's statuses
         last_status_commit, statuses = scm.get_last_statuses_from_pull_request(id_pr, exclude_head=False)
         pr = scm.get_pull_request(id_pr)
@@ -475,9 +511,11 @@ def get_do_not_touch_packages(id_pr, packages, scm, dep_graph, rebuild=False):
 @retry
 def pull_request_information(id_pr, workspace):
     """Relevant information for packages from a pull request
+
     Args:
         id_pr: ID of the pull request
         workspace:
+
     Returns:
         tuple
     """

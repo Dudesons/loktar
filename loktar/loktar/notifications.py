@@ -1,8 +1,8 @@
 from github import Github
-from loktar.log import Log
-from loktar.environment import GITHUB_INFO
 
 from loktar.decorators import retry
+from loktar.environment import GITHUB_INFO
+from loktar.log import Log
 
 
 @retry
@@ -30,7 +30,7 @@ def define_job_status_on_github_commit(commit_id, state, target_url, context, de
             elif state == 'error':
                 description = GITHUB_INFO['notification']['error']
             elif state == 'failure':
-                description = GITHUB_INFO['notification']['faillure']
+                description = GITHUB_INFO['notification']['failure']
             else:
                 description = GITHUB_INFO['notification']['unknown']
 

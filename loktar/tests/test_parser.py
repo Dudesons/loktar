@@ -1,5 +1,3 @@
-import pytest
-
 from loktar.job import build_params_to_context
 from loktar.parser import parse_statuses
 

@@ -18,15 +18,13 @@ class Example(ComplexPlugin):
             self._run(self.timeline)
 
         def check_requirements(self):
-            print "itit"
+            print("itit")
 
         def parse(self):
-            print 'tutu'
+            print('tutu')
 
 
 def test_complex_plugin(mocker):
-
-
     mocker.patch('loktar.testing.plugin.lcd')
     mocker.patch('loktar.testing.plugin.exe')
 

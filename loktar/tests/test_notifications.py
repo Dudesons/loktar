@@ -35,7 +35,6 @@ def test_define_job_status_on_github_commit(mocker, commit_id, state, descriptio
         def get_organization(self, *args, **kwargs):
             return FakeOrga()
 
-
     mocker.patch("loktar.notifications.Github", side_effect=FakeGithub)
     define_job_status_on_github_commit(commit_id,
                                        state,

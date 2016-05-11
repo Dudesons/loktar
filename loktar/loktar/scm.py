@@ -10,6 +10,7 @@ logger = Log()
 
 class Github(object):
     """Wrapper for the github3 library
+
     Args:
         login (str): login for GitHub
         password (str): password for GitHub
@@ -25,8 +26,10 @@ class Github(object):
     @retry
     def search_pull_request_id(self, branch):
         """Look for an open pull request id given a branch
+
         Args:
             branch (str): name of the branch
+
         Returns:
             int or None: the id of the pull request or None
         """
@@ -42,9 +45,11 @@ class Github(object):
     @retry
     def get_pull_requests(self, state='open', use_cache=False):
         """Get a pull request from the GitHub API
+
         Args:
             state (str): State of the pull request
             use_cache (Optional[bool]): If True, only return cached pull requests. Otherwise, make another request.
+
         Returns:
             a list of PullRequest instance
         """
@@ -57,6 +62,7 @@ class Github(object):
 
     def _cache_pull_requests(self, pull_requests=None):
         """Cache a list of pull requests
+
         Args:
             pull_requests (list of github.pullrequest.PullRequest)
         """
@@ -66,10 +72,12 @@ class Github(object):
     @retry
     def get_pull_request(self, pull_request_id, use_cache=True):
         """Get a pull request from the GitHub API
+
         Args:
             pull_request_id (int): ID of the pull request
             use_cache (Optional[bool]): If True, only return cached pull requests. Otherwise, make another request.
                 If we cannot find the pull request in the cache, we make another request.
+
         Returns:
             a PullRequest instance
         """
@@ -83,8 +91,10 @@ class Github(object):
     @retry
     def get_commit_message_modified_files_on_pull_request(self, pull_request_id):
         """Retrieve the commit messages from the pull request and associate the modified files for it.
+
         Args:
             pull_request_id (int): ID of the pull request
+
         Returns:
             dict of str: list: Comments of the commits linked to the pull request are keys, modified files are values.
         """
@@ -100,8 +110,10 @@ class Github(object):
     @retry
     def get_git_branch_from_pull_request(self, pull_request_id):
         """Retrieve the branch name from the pull request id
+
         Args:
             pull_request_id (int): ID of the pull request
+
         Returns:
             A branch name
         """
@@ -111,9 +123,11 @@ class Github(object):
     @retry
     def get_last_statuses_from_pull_request(self, pull_request_id, exclude_head=True):
         """Get the statuses from a pull request ID.
+
         Args:
             pull_request_id (int): ID of the pull request
             exclude_head (bool): If True, skip the head commit
+
         Returns:
             a tuple of github.Commit, list of github.CommitStatus.CommitStatus: List of statuses.
                 Empty if no status was found.
@@ -130,9 +144,11 @@ class Github(object):
     @retry
     def get_last_commits_from_pull_request(self, pull_request_id, until_commit=None):
         """Get the commit from a pull request ID.
+
         Args:
             pull_request_id (int): ID of the pull request
             until_commit (github.Commit.Commit): Stop at a specific commit (will be excluded)
+
         Returns:
             list of github.Commit.Commit: the last commits
         """
@@ -148,10 +164,12 @@ class Github(object):
     @retry
     def create_pull_request_comment(self, pull_request_id, comment, check_unique=False):
         """Create an issue comment on the pull request
+
         Args:
             pull_request_id (int): ID of the pull request
             comment (basestring): Comment text to post
             check_unique (bool): If True do not comment if it has already been posted.
+
         Returns:
             github.IssueComment.IssueComment: The comment that was created
         """
@@ -167,9 +185,11 @@ class Github(object):
 @retry
 def fetch_github_file(url, token):
     """Fetch a file from GitHub
+
     Args:
         url (str): URL the file is at.
         token (str): Authorization token for GitHub.
+
     Returns:
         str: the raw content of the file.
     """
@@ -183,4 +203,3 @@ def fetch_github_file(url, token):
     m_file = StringIO.StringIO()
     m_file.write(req.content)
     return m_file.getvalue()
-

@@ -4,20 +4,13 @@ import pytest
 from loktar.scm import Github
 
 
-@pytest.fixture
-def mock_github_obj(mocker):
-    github_mock = mocker.patch('loktar.scm.GitHub')
-
-    return github_mock
-
-
-def test_github(mock_github_obj):
-    class File(object):
+class File(object):
 
         def __init__(self, name):
             self.filename = name
 
-    class Commit(object):
+
+class Commit(object):
         files = [File("toto"), File("toto"), File("lulu")]
         sha = 'sha'
 
@@ -31,14 +24,17 @@ def test_github(mock_github_obj):
         def get_statuses(self):
             return ['status1', 'status2']
 
-    class PullRequestPart(object):
+
+class PullRequestPart(object):
         ref = 'branch'
         sha = 'commitsha'
 
-    class IssueComment(object):
+
+class IssueComment(object):
         body = 'existing comment'
 
-    class PullRequest(object):
+
+class PullRequest(object):
         head = PullRequestPart()
         number = 565
 
@@ -61,7 +57,8 @@ def test_github(mock_github_obj):
         def create_issue_comment(self, comment):
             return comment
 
-    class Repository(object):
+
+class Repository(object):
 
         def get_pulls(self, state=None):
             return [
@@ -78,12 +75,23 @@ def test_github(mock_github_obj):
         def commit(self, sha):
             return Commit()
 
-    class fakePR(object):
+
+class fakePR(object):
 
         def get_organization(self, *args, **kwargs):
             mock_get_repo = MagicMock()
             mock_get_repo.get_repo.return_value = Repository()
             return mock_get_repo
+
+
+@pytest.fixture
+def mock_github_obj(mocker):
+    github_mock = mocker.patch('loktar.scm.GitHub')
+
+    return github_mock
+
+
+def test_github(mock_github_obj):
 
     def fake(*args, **kwargs):
         return fakePR()
