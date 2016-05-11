@@ -11,9 +11,11 @@ DB = Job()
 def init(scm_provider, payload):
     lokregar_payload = {"status": 0, "scm": scm_provider, "lastAccess": time.time()}
     lokregar_payload.update(payload)
+    if DOCKER_ENGINE["address"] is None or DOCKER_ENGINE["port"] is None:
+        raise ValueError("DOCKER_ENGINE['address'] or DOCKER_ENGINE['port'] is None")
 
     docker_client = docker.Client(base_url="{0}:{1}".format(DOCKER_ENGINE["address"], DOCKER_ENGINE["port"]))
-    container_info = docker_client.create_container(DOCKER_CI, command="sleep 1000")
+    container_info = docker_client.create_container(DOCKER_CI["image"], command="sleep 1000")
     docker_client.start(container=container_info['Id'])
     lokregar_payload["id"] = container_info['Id']
 
@@ -29,3 +31,4 @@ def get_jobs():
 
 def get_job(id):
     return DB.get_job(id), 201
+
