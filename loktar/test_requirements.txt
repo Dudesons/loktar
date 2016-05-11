@@ -1,0 +1,6 @@
+mock==2.0.0
+coverage==4.0.3
+pytest==2.9.1
+pytest-cov==2.2.1
+pytest-mock==0.11.0
+mockredispy==2.9.3
