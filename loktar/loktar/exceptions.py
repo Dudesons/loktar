@@ -52,3 +52,7 @@ class SimplePluginErrorConfiguration(Exception):
 
 class ImportPluginError(Exception):
     """Exception raised by if the plugin doesn't exist"""
+
+
+class UnknownStorageMethod(Exception):
+    """Exception raised by if the storage method doesn't exist"""
