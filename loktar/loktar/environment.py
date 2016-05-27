@@ -1,5 +1,4 @@
 import boto.s3 as s3
-import boto.s3.lifecycle as s3_lifecyle
 from fabric.api import env
 from fabric.api import lcd
 from fabric.api import local
@@ -119,6 +118,8 @@ AWS = {
     "BUCKET": os.getenv("{0}AWS_BUCKET".format(PREFIX_ENV_VAR), None)
 }
 
+PLUGINS_LOCATIONS = os.getenv("{0}PLUGINS_LOCATIONS".format(PREFIX_ENV_VAR), [])
+
 
 def prepare_test_env(branch, github_organization=None, github_repository=None):
     """Prepare the test environment
@@ -171,7 +172,7 @@ def prepare_test_env(branch, github_organization=None, github_repository=None):
                 local("rm -rf {0}/.git".format(unique_path_dir))
 
         with lcd("/tmp"):
-            if not exec_command_with_retry("tar -czf {0}.tar {0}".format(unique_name_dir), 0, MAX_RETRY_GITHUB):
+            if not exec_command_with_retry("tar -czf {0}.tar.gz {0}".format(unique_name_dir), 0, MAX_RETRY_GITHUB):
                 raise PrepareEnvFail
 
         logger.info("The test env is ready!")
@@ -233,13 +234,13 @@ def store_test_env_on_s3(target, aws_region, aws_bucket):
     Returns
         A string who debribes the archive (eg: s3:@:foobar foobar here is the archive name)
     """
-    key_name = target.split("/")[-1]
+    key_name = "{0}.tar.gz".format(target.split("/")[-1])
     connexion = s3.connect_to_region(AWS["REGION"] if AWS["REGION"] is not None else aws_region)
     bucket = connexion.get_bucket(AWS["BUCKET"] if AWS["BUCKET"] is not None else aws_bucket)
     key = bucket.new_key(key_name)
-    key.set_contents_from_filename("{0}.tar".format(target))
+    key.set_contents_from_filename("{0}.tar.gz".format(target))
 
-    return "s3:/{0}/{1}".format(AWS["BUCKET"], key_name)
+    return "s3:{0}".format(key_name)
 
 
 def store_test_env(store_type, target, **kwargs):
@@ -255,5 +256,37 @@ def store_test_env(store_type, target, **kwargs):
     """
     if store_type == "s3":
         return store_test_env_on_s3(target, kwargs.get("aws_region", None), kwargs.get("aws_bucket", None))
+    else:
+        raise UnknownStorageMethod
+
+
+def get_back_test_env_from_s3(target, aws_region, aws_bucket):
+    """Store an archive on aws s3
+
+        Args:
+            target (str): this is the archive target
+            aws_region (str, None): this is the aws region to connect for the bucket,
+                aws_region can be set by a variable environment AWS_REGION, this variable it takes in first if it set
+                can be set at None
+            aws_bucket (str, None): this is the bucket name where the archive will be stored
+                aws_bucket can be set by a variable environment AWS_BUCKET, this variable it takes in first if it set
+
+
+        Returns
+            A string who debribes the archive (eg: s3:@:foobar foobar here is the archive name)
+    """
+    test_env_location_ci = "/tmp/{0}".format(target)
+    connexion = s3.connect_to_region(AWS["REGION"] if AWS["REGION"] is not None else aws_region)
+    bucket = connexion.get_bucket(AWS["BUCKET"] if AWS["BUCKET"] is not None else aws_bucket)
+    key = bucket.get_key(target)
+    key.get_contents_to_filename(test_env_location_ci)
+
+    return test_env_location_ci
+
+
+def get_back_test_env(test_env_location, **kwargs):
+    storage_type, archive = test_env_location.split(":")
+    if storage_type == "s3":
+        return get_back_test_env_from_s3(archive, kwargs.get("aws_region", None), kwargs.get("aws_bucket", None))
     else:
         raise UnknownStorageMethod
