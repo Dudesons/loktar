@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from setuptools import find_packages
+from pip.req import parse_requirements
 
 
 try:
@@ -11,11 +12,10 @@ except ImportError:
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
-from pip.req import parse_requirements
 requirements = [str(i.req) for i in parse_requirements("requirements.txt", session=False)]
 test_requirements = [str(i.req) for i in parse_requirements("test_requirements.txt", session=False)]
 
-VERSION = '0.4'
+VERSION = '0.13'
 
 setup(
     name='loktar',
