@@ -41,6 +41,8 @@ clean-test:
 	rm -fr .tox/
 	rm -f .coverage
 	rm -fr htmlcov/
+	rm -rf .cache
+	rm -rf coverage.xml
 
 deps:
 	pip install -r requirements.txt --upgrade
@@ -66,6 +68,10 @@ docs:
 	sphinx-apidoc -o docs/ traxit_ci -e
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
+
+release: clean
+	python setup.py sdist upload -r pypi
+	python setup.py bdist_wheel upload -r pypi
 
 dist: clean
 	python setup.py sdist
