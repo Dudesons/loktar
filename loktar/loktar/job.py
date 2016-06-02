@@ -33,8 +33,7 @@ def ci_downstream(ci_config, pkg_name, type_task, params, job_format="{0} - {1}"
         type_task: apparently only ``'superman'``
         params: parameters sent to jenkins
     """
-    ci_server = jenkins.Jenkins('{0}://{1}'.format(JENKINS_PROTOCOL,
-                                                   ci_config['host']),
+    ci_server = jenkins.Jenkins(ci_config['host'],
                                 ci_config['user'],
                                 ci_config['password'])
     ci_server.build_job(job_format.format(pkg_name, type_task), params)
