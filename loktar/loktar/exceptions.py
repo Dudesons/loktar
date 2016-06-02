@@ -56,3 +56,7 @@ class ImportPluginError(Exception):
 
 class UnknownStorageMethod(Exception):
     """Exception raised by if the storage method doesn't exist"""
+
+
+class WheelPackageFail(Exception):
+    """Exception raised when the python wheel packaging fail"""
