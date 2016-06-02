@@ -6,7 +6,7 @@ from loktar.log import Log
 
 
 @retry
-def define_job_status_on_github_commit(commit_id, state, target_url, context, description=None):
+def define_job_status_on_github_commit(commit_id, state, target_url, context, description=None, user=None, password=None, organization=None, repository=None):
     """Define the status of a job on a Github commit.
 
     Args:
@@ -15,12 +15,24 @@ def define_job_status_on_github_commit(commit_id, state, target_url, context, de
         target_url (str): the URL that can be clicked in the Pull Request.
         context: The header of the status.
         description (Optional[str]): Optional description. Defaults according to ``state``.
-
+        user (str, None): the user who post the status
+        password (str, None): the user password
+        organization (str, None): the organization of the repository target
+        repository (str, None): the repository target
     """
     logger = Log()
     if commit_id is not None:
-        connexion = Github(GITHUB_INFO['login']['user'], GITHUB_INFO['login']['password'])
-        repository = connexion.get_organization(GITHUB_INFO['organization']).get_repo(GITHUB_INFO['repository'])
+        connexion = Github(GITHUB_INFO['login']['user'] if GITHUB_INFO['login']['user'] is not None else user,
+                           GITHUB_INFO['login']['password']
+                           if GITHUB_INFO['login']['password'] is not None else
+                           password)
+
+        repository = connexion.get_organization(GITHUB_INFO['organization']
+                                                if GITHUB_INFO['organization'] is not None else
+                                                organization)\
+                              .get_repo(GITHUB_INFO['repository']
+                                        if GITHUB_INFO['repository'] is not None else
+                                        repository)
 
         if description is None:
             if state == 'pending':
