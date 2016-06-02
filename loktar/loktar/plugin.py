@@ -1,3 +1,4 @@
+from fabric.api import cd
 from fabric.api import lcd
 from fabric.api import settings
 import importlib
@@ -13,22 +14,26 @@ from loktar.log import Log
 
 
 class SimplePlugin(object):
-    def __init__(self, package_info, config):
+    def __init__(self, package_info, config, remote=False):
         """Constructor for the SimplePlugin
 
         Args:
             package_info (dict): represent all informations for the target package in the config.json
             config (dict): this is the configuration plugin. It contains 2 keys 'run' & 'clean'.
+            remote (bool): Indicate if it has to execute commands in remote or not
 
         Raise:
             SimplePluginErrorConfiguration: An error occurred when a key is missing in the configuration
         """
         self.logger = Log()
         self.config = config
+        self.package_info = package_info
+        self.remote = remote
+        self.cwd = lcd if self.remote is False else cd
 
         try:
-            self.path = package_info["test_location"]
-        except KeyError:
+            assert "package_location" in package_info
+        except AssertionError:
             self.path = "{0}/{1}/{2}".format(ROOT_PATH["container"],
                                              package_info["pkg_dir"],
                                              package_info["pkg_name"]) \
@@ -47,9 +52,10 @@ class SimplePlugin(object):
         Raise:
             CITestFail: An error occurred when the test failed
         """
-        with lcd(self.path):
+
+        with self.cwd(self.package_info["package_location"]):
             with settings(warn_only=True):
-                if not exe(cmd, remote=False):
+                if not exe(cmd, remote=self.remote):
                     raise CITestFail("Test failed")
 
     def _base_run(self):
@@ -82,7 +88,7 @@ class ComplexPlugin(SimplePlugin):
             95: self._base_clean
         }
 
-    def _run(self, timeline):
+    def _run(self):
         """Run the timeline
         Args:
             timeline (dict): represent the user timeline, it will be merged with the origin timeline
@@ -91,14 +97,14 @@ class ComplexPlugin(SimplePlugin):
             ForbiddenTimelineKey: An error occurred when the plugin try to used a reserved key
         """
         try:
-            assert not (set(self.__origin.keys()) & set(timeline))
+            assert not (set(self.__origin.keys()) & set(self.timeline))
         except AssertionError:
             raise ForbiddenTimelineKey("Timeline key: 50 & 95 are reserved")
 
-        timeline.update(self.__origin)
+        self.timeline.update(self.__origin)
 
-        for ref in sorted(timeline):
-            timeline[ref]()
+        for ref in sorted(self.timeline):
+            self.timeline[ref]()
 
 
 def find_plugin(plugin_name, plugin_locations):

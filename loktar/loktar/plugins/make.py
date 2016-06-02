@@ -19,7 +19,7 @@ class Make(ComplexPlugin):
             }
 
         def run(self):
-            self._run(self.timeline)
+            self._run()
 
         def get_results(self):
             print 'ToDo'
