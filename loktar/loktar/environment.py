@@ -1,4 +1,3 @@
-import boto.s3 as s3
 from fabric.api import env
 from fabric.api import lcd
 from fabric.api import local
@@ -8,9 +7,7 @@ import os
 from uuid import uuid4
 
 from loktar.cmd import exec_command_with_retry
-from loktar.decorators import retry
 from loktar.exceptions import PrepareEnvFail
-from loktar.exceptions import UnknownStorageMethod
 from loktar.log import Log
 
 env.disable_known_hosts = True
