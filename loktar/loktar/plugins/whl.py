@@ -34,16 +34,19 @@ class Whl(ComplexPlugin):
         def get_version(self):
             pypicloud = PypicloudClient()
             if self.package_info["mode"] == "master":
-                self.share_memory["latest_version"] = str(int(filter(
-                    lambda pkg: pkg.isdigit(),
-                    sorted(
-                        map(
-                            lambda pkg: pkg["version"],
-                            pypicloud.get_versions(self.package_info["pkg_name"])
-                        ),
-                        reverse=True
-                    )
-                )[0]) + 1)
+                try:
+                    self.share_memory["latest_version"] = str(int(filter(
+                        lambda pkg: pkg.isdigit(),
+                        sorted(
+                            map(
+                                lambda pkg: pkg["version"],
+                                pypicloud.get_versions(self.package_info["pkg_name"])
+                            ),
+                            reverse=True
+                        )
+                    )[0]) + 1)
+                except IndexError:
+                    self.share_memory["latest_version"] = 1
             else:
                 self.share_memory["latest_version"] = self.package_info["mode"]
 
