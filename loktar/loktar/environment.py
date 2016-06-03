@@ -62,45 +62,17 @@ GITHUB_API_COMMITS = {
     }
 }
 CONFIG_CI_FILE = os.getenv("{0}CONFIG_CI_FILE".format(PREFIX_ENV_VAR), "config.json")
-DOCKER_ENGINE = {
-    "address": os.getenv("{0}DOCKER_CI_ADDRESS", "127.0.0.1"),
-    "port": os.getenv("{0}DOCKER_CI_PORT", 2375),
-    "registry_url": os.getenv("{0}DOCKER_CI_REGISTRY", None)
-}
-DOCKER_CI = {
-    "registry": os.getenv("{0}DOCKER_CI_REGISTRY".format(PREFIX_ENV_VAR), None),
-    "image": os.getenv("{0}DOCKER_CI_IMAGE".format(PREFIX_ENV_VAR), None),
-    "acceptance_image": os.getenv("{0}DOCKER_CI_IMAGE".format(PREFIX_ENV_VAR), None),
-    "base_image": os.getenv("{0}DOCKER_CI_BASE_IMAGE".format(PREFIX_ENV_VAR), None),
-    "user": os.getenv("{0}DOCKER_CI_USER".format(PREFIX_ENV_VAR), None),
-    "address_build": os.getenv("{0}DOCKER_CI_ADDRESS_BUILD".format(PREFIX_ENV_VAR), None),
-    "services": os.getenv("{0}DOCKER_CI_SERVICES".format(PREFIX_ENV_VAR), None),
-}
+
 ROOT_PATH = {
     "jenkins": os.getenv("{0}ROOT_PATH_JENKINS".format(PREFIX_ENV_VAR), "/var/lib/jenkins"),
     "container": os.getenv("{0}ROOT_PATH_CONTAINER".format(PREFIX_ENV_VAR), None),
     "build": os.getenv("{0}ROOT_PATH_BUILD".format(PREFIX_ENV_VAR), None)
 }
-BUILD_PACKAGE = {
-    "wheel": os.getenv("{0}BUILD_PACKAGE_WHEEL".format(PREFIX_ENV_VAR), "python setup.py bdist_wheel"),
-    "debian": os.getenv("{0}BUILD_PACKAGE_DEBIAN".format(PREFIX_ENV_VAR), "dpkg --build"),
-    "docker": os.getenv("{0}BUILD_PACKAGE_DOCKER".format(PREFIX_ENV_VAR),
-                        "docker build --no-cache -t {0}".format(DOCKER_ENGINE["registry_url"]))
-}
-
-PUSH_PACKAGE = {
-    "pypicloud": os.getenv("{0}PUSH_PACKAGE_PYPICLOUD".format(PREFIX_ENV_VAR), "twine upload -r pypicloud *whl"),
-    "debian": os.getenv("{0}PUSH_PACKAGE_DEBIAN".format(PREFIX_ENV_VAR),
-                        "deb-s3 upload -p -b {0} -c {1} -m {2} -v public -a amd64 *.deb"
-                        .format(DEBIAN_REPOSITORY, CODE_NAME, COMPENANT)),
-    "docker": os.getenv("{0}PUSH_PACKAGE_DOCKER".format(PREFIX_ENV_VAR),
-                        "docker push {0}".format(DOCKER_ENGINE["registry_url"]))
-}
 
 JENKINS = {
-    "host": "delivery.net:8080",
-    "user": "lokbot",
-    "password": "L39yN@;y6+We"
+    "host": os.getenv("{0}JENKINS_HOST".format(PREFIX_ENV_VAR), None),
+    "user": os.getenv("{0}JENKINS_USER".format(PREFIX_ENV_VAR), None),
+    "password": os.getenv("{0}JENKINS_PASSWORD".format(PREFIX_ENV_VAR), None)
 }
 
 SLAVE_ENVIRONMENT = {
