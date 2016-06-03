@@ -52,11 +52,11 @@ class SimplePlugin(object):
         Raise:
             CITestFail: An error occurred when the test failed
         """
-
-        with self.cwd(self.package_info["package_location"]):
-            with settings(warn_only=True):
-                if not exe(cmd, remote=self.remote):
-                    raise CITestFail("Test failed")
+        if cmd != "" and cmd is not None:
+            with self.cwd(self.package_info["package_location"]):
+                with settings(warn_only=True):
+                    if not exe(cmd, remote=self.remote):
+                        raise CITestFail("Test failed")
 
     def _base_run(self):
         try:

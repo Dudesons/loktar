@@ -16,7 +16,7 @@ class Whl(ComplexPlugin):
             ComplexPlugin.__init__(self, package_info,
                                    {
                                        "command": {
-                                           "run": "",
+                                           "run": None,
                                            "clean": "make clean"
                                        }
                                    })
@@ -53,7 +53,7 @@ class Whl(ComplexPlugin):
         def release(self):
             """
             """
-            with self.cwd(self.path):
+            with self.cwd(self.package_info["package_location"]):
                 # Edit the package version
                 if not exe("sed -i 's/VERSION = .*/VERSION = \"{0}\"/g' setup.py"
                            .format(self.share_memory["latest_version"]), remote=False):
