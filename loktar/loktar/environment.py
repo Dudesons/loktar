@@ -105,7 +105,7 @@ def prepare_test_env(branch, github_organization=None, github_repository=None):
     logger = Log()
     unique_name_dir = str(uuid4())
     unique_path_dir = "/tmp/{0}".format(unique_name_dir)
-
+    archive = "{0}.tar.gz".format(unique_name_dir)
     logger.info("Preparing the test environment")
 
     os.mkdir(unique_path_dir)
@@ -140,7 +140,7 @@ def prepare_test_env(branch, github_organization=None, github_repository=None):
                 local("rm -rf {0}/.git".format(unique_path_dir))
 
         with lcd("/tmp"):
-            if not exec_command_with_retry("tar -czf {0}.tar.gz {0}".format(unique_name_dir), 0, MAX_RETRY_GITHUB):
+            if not exec_command_with_retry("tar -czf {0} {1}".format(archive, unique_name_dir), 0, MAX_RETRY_GITHUB):
                 raise PrepareEnvFail
 
         logger.info("The test env is ready!")
@@ -152,7 +152,7 @@ def prepare_test_env(branch, github_organization=None, github_repository=None):
         local("rm -rf {0}*".format(unique_path_dir))
         raise
 
-    return unique_path_dir
+    return "/tmp/{0}".format(archive)
 
 
 def get_config(package_name, test_env_path, full=False):
