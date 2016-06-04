@@ -1,2 +1,0 @@
-db.keys("{0}*".format(os.environ.get("HOSTNAME")))
-db.get(db.keys("{0}*".format(os.environ.get("HOSTNAME")))[0])
