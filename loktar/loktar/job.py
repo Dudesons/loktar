@@ -12,7 +12,6 @@ from jenkinsapi.jenkins import Jenkins
 from requests import HTTPError
 
 from loktar.environment import GITHUB_INFO
-from loktar.environment import JENKINS_PROTOCOL
 from loktar.exceptions import CIJobFail
 from loktar.log import Log
 from loktar.notifications import define_job_status_on_github_commit
@@ -60,8 +59,7 @@ def job_manager(ci_config,
     """
     types_build = ['test', 'artifact'] if git_branch != 'master' else ['artifactmaster']
 
-    jenkins_instance = Jenkins('{0}://{1}'.format(JENKINS_PROTOCOL,
-                                                  ci_config['host']),
+    jenkins_instance = Jenkins(ci_config['host'],
                                username=ci_config['user'],
                                password=ci_config['password'])
 

@@ -27,12 +27,12 @@ class SimplePlugin(object):
         """
         self.logger = Log()
         self.config = config
-        self.package_info = package_info
         self.remote = remote
         self.cwd = lcd if self.remote is False else cd
 
         try:
             assert "package_location" in package_info
+            self.path = package_info["package_location"]
         except AssertionError:
             self.path = "{0}/{1}/{2}".format(ROOT_PATH["container"],
                                              package_info["pkg_dir"],
@@ -42,8 +42,8 @@ class SimplePlugin(object):
                                                               package_info["pkg_name"])
 
         try:
-            self.cmd = self.config["command"]
-        except KeyError:
+            assert "run" in self.config["command"] and "clean" in self.config["command"]
+        except AssertionError:
             raise SimplePluginErrorConfiguration()
 
     def __command(self, cmd):
@@ -53,20 +53,20 @@ class SimplePlugin(object):
             CITestFail: An error occurred when the test failed
         """
         if cmd != "" and cmd is not None:
-            with self.cwd(self.package_info["package_location"]):
+            with self.cwd(self.path):
                 with settings(warn_only=True):
                     if not exe(cmd, remote=self.remote):
                         raise CITestFail("Test failed")
 
     def _base_run(self):
         try:
-            self.__command(self.cmd["run"])
+            self.__command(self.config["command"]["run"])
         except CITestFail:
             self._base_clean()
             raise
 
     def _base_clean(self):
-        self.__command(self.cmd["clean"])
+        self.__command(self.config["command"]["clean"])
 
 
 class ComplexPlugin(SimplePlugin):
