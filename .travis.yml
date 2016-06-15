@@ -6,3 +6,6 @@ install:
   - pip install -r loktar/test_requirements.txt
 # command to run tests
 script: cd loktar && make test
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
