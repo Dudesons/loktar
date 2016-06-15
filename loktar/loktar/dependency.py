@@ -3,6 +3,8 @@ from fabric.api import lcd
 from fabric.api import local
 from itertools import product
 import json
+import matplotlib
+import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import os
@@ -121,7 +123,6 @@ def get_excluded_deps(packages, dict_message_files, modified_packages):
     # Packages whose dependencies should be ignored
     # Initialize to all of them and delete them one by one if some keywords are not exclusion keywords.
     exclude_dep = set(copy.deepcopy(modified_packages))
-
     for commit_message, modified_files in dict_message_files.items():
         for path in modified_files:
             package_name = package_from_path(path, packages)
@@ -260,7 +261,6 @@ def get_package_requirements(package_name, packages, repo_path, restrict_require
     Returns:
         set of str: List of requirements for this package
     """
-
     build_deps_path = os.path.join(repo_path, package_path(packages[package_name]))
     requirements = deps(build_deps_path) & set(packages.keys())
 
@@ -373,9 +373,7 @@ def gplot(graph, dependencies_levels, save_path=None, output_type=None):
         logger.info("Storing {0}.{1} in {2}".format(name_file, output_type, save_path))
 
     if output_type == "png":
-        import matplotlib
         matplotlib.use('Agg')
-        import matplotlib.pyplot as plt
         logger.info("Drawing the graph")
         plt.figure(figsize=(12, 14))
         nx.draw_networkx(graph, pos=dependencies_layout(dependencies_levels), edge_color='g', node_size=3000)

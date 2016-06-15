@@ -6,7 +6,15 @@ from loktar.log import Log
 
 
 @retry
-def define_job_status_on_github_commit(commit_id, state, target_url, context, description=None, user=None, password=None, organization=None, repository=None):
+def define_job_status_on_github_commit(commit_id,
+                                       state,
+                                       target_url,
+                                       context,
+                                       description=None,
+                                       user=None,
+                                       password=None,
+                                       organization=None,
+                                       repository=None):
     """Define the status of a job on a Github commit.
 
     Args:

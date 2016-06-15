@@ -1,6 +1,6 @@
 from loktar.environment import PLUGINS_LOCATIONS
-from loktar.exceptions import CITestFail
 from loktar.exceptions import CIBuildPackageFail
+from loktar.exceptions import CITestFail
 from loktar.exceptions import ImportPluginError
 from loktar.log import Log
 from loktar.plugin import find_plugin
@@ -9,15 +9,15 @@ from loktar.plugin import find_plugin
 def strategy_runner(package, run_type):
     """Run the packaging functions
 
-    Args:
-        package (dict): package_config
-        run_type (str): Represent the strategy to run on a package (test or artifact)
+        Args:
+            package (dict): package_config
+            run_type (str): Represent the strategy to run on a package (test or artifact)
 
-    Raises:
-        CITestFail: some error occurred during the test
-        CITestUnknown: wrong value for config['test_type']
-        CIBuildPackageFail: some error occurred during a packaging
-        ImportPluginError: Fail to find / import a plugin
+        Raises:
+            CITestFail: some error occurred during the test
+            CITestUnknown: wrong value for config['test_type']
+            CIBuildPackageFail: some error occurred during a packaging
+            ImportPluginError: Fail to find / import a plugin
     """
 
     if run_type not in ["test", "build"]:
@@ -38,4 +38,3 @@ def strategy_runner(package, run_type):
     except Exception as e:
         logger.error(repr(e))
         raise params["exception"]
-
