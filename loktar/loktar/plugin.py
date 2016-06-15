@@ -28,11 +28,13 @@ class SimplePlugin(object):
         self.logger = Log()
         self.config = config
         self.remote = remote
+        self.package_info = package_info
         self.cwd = lcd if self.remote is False else cd
 
         try:
             assert "package_location" in package_info
-            self.path = package_info["package_location"]
+            self.path = "{0}/{1}".format(package_info["package_location"], package_info["pkg_dir"]) \
+                        if "pkg_dir" in package_info else package_info["package_location"]
         except AssertionError:
             self.path = "{0}/{1}/{2}".format(ROOT_PATH["container"],
                                              package_info["pkg_dir"],
@@ -70,7 +72,7 @@ class SimplePlugin(object):
 
 
 class ComplexPlugin(SimplePlugin):
-    def __init__(self, package_info, config):
+    def __init__(self, package_info, config, **kwargs):
         """Constructor for the ComplexPlugin, child of SimplePlugin
 
         Args:
@@ -80,7 +82,7 @@ class ComplexPlugin(SimplePlugin):
         Raise:
             SimplePluginErrorConfiguration: An error occurred when a key is missing in the configuration
         """
-        SimplePlugin.__init__(self, package_info, config)
+        SimplePlugin.__init__(self, package_info, config, remote=kwargs.get("remote", False))
         self.timeline = dict()
         self.share_memory = dict()
         self.__origin = {
@@ -90,8 +92,6 @@ class ComplexPlugin(SimplePlugin):
 
     def _run(self):
         """Run the timeline
-        Args:
-            timeline (dict): represent the user timeline, it will be merged with the origin timeline
 
         Raise:
             ForbiddenTimelineKey: An error occurred when the plugin try to used a reserved key
