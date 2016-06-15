@@ -8,18 +8,31 @@ from loktar.plugin import ComplexPlugin
 
 
 def run(*args, **kwargs):
-    Whl(args[0]).run()
+    try:
+        Whl(args[0], args[1]).run()
+    except IndexError:
+        print(Whl.__init__.__doc__)
+        raise
 
 
 class Whl(ComplexPlugin):
-        def __init__(self, package_info):
+        def __init__(self, package_info, remote):
+            """
+                Args:
+                    package_info (dict): Contains information about the package to execute inside the plugin
+                    remote (bool): Define if the plugin will be execute in remote or not
+
+                Raises:
+                    WheelPackageFail: when one of the steps for packaging or uploading the package failed
+            """
             ComplexPlugin.__init__(self, package_info,
                                    {
                                        "command": {
                                            "run": None,
                                            "clean": "make clean"
                                        }
-                                   })
+                                   },
+                                   remote=remote)
             self.timeline = {
                 10: self.get_version,
                 40: self.release
@@ -48,7 +61,7 @@ class Whl(ComplexPlugin):
                 except IndexError:
                     self.share_memory["latest_version"] = 1
             else:
-                self.share_memory["latest_version"] = self.package_info["mode"]
+                self.share_memory["latest_version"] = "0.{0}".format(self.package_info["mode"])
 
         def release(self):
             """
@@ -56,11 +69,11 @@ class Whl(ComplexPlugin):
             with self.cwd(self.package_info["package_location"]):
                 # Edit the package version
                 if not exe("sed -i 's/VERSION = .*/VERSION = \"{0}\"/g' setup.py"
-                           .format(self.share_memory["latest_version"]), remote=False):
+                           .format(self.share_memory["latest_version"]), remote=self.remote):
                     raise WheelPackageFail("Failed to update the version")
 
                 # Build package
-                if not exec_command_with_retry("make release", max_retry=MAX_RETRY_PYTHON_UPLOAD, remote=False):
+                if not exec_command_with_retry("make release", max_retry=MAX_RETRY_PYTHON_UPLOAD, remote=self.remote):
                     raise WheelPackageFail('Release failed')
 
                 self.logger.info('Wheel package built & uploaded')
