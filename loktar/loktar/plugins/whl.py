@@ -17,7 +17,8 @@ def run(*args, **kwargs):
 
 class Whl(ComplexPlugin):
         def __init__(self, package_info, remote):
-            """
+            """Plugin for building python wheel package
+
                 Args:
                     package_info (dict): Contains information about the package to execute inside the plugin
                     remote (bool): Define if the plugin will be execute in remote or not
@@ -41,6 +42,7 @@ class Whl(ComplexPlugin):
 
         def run(self):
             """Default method for running the timeline
+
             """
             self._run()
 
@@ -64,7 +66,8 @@ class Whl(ComplexPlugin):
                 self.share_memory["latest_version"] = "0.{0}".format(self.package_info["mode"])
 
         def release(self):
-            """
+            """Create & upload the package
+
             """
             with self.cwd(self.package_info["package_location"]):
                 # Edit the package version

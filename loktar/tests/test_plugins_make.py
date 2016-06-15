@@ -4,12 +4,14 @@ from loktar.exceptions import CITestFail
 from loktar.plugins.make import run
 
 
-def test_plugins_make(mocker):
+@pytest.mark.parametrize("remote", [True, False])
+def test_plugins_make(mocker, remote):
     mocker.patch("loktar.plugin.exe")
-    run({"pkg_name": "foobar", "package_location": "/tmp"})
+    run({"pkg_name": "foobar", "package_location": "/tmp"}, remote)
 
 
-def test_plugins_make_fail_on_update_version(mocker):
+@pytest.mark.parametrize("remote", [True, False])
+def test_plugins_make_fail_on_update_version(mocker, remote):
     mocker.patch("loktar.plugin.exe", return_value=False)
     with pytest.raises(CITestFail):
-        run({"pkg_name": "foobar", "package_location": "/tmp"})
+        run({"pkg_name": "foobar", "package_location": "/tmp"}, remote)

@@ -4,14 +4,14 @@ from mock import MagicMock
 import networkx as nx
 import pytest
 
-from loktar.dependency import dependency_graph_from_modified_packages
 from loktar.dependency import dependencies_layout
+from loktar.dependency import dependency_graph_from_modified_packages
 from loktar.dependency import gen_dependencies_level
 from loktar.dependency import get_do_not_touch_packages
 from loktar.dependency import get_excluded_deps
 from loktar.dependency import get_package_requirements
-from loktar.dependency import pull_request_information
 from loktar.dependency import package_from_path
+from loktar.dependency import pull_request_information
 from loktar.job import build_params_to_context
 
 repo_path = '/repo/'
@@ -36,25 +36,18 @@ def build_deps(command):
 
 
 @pytest.mark.parametrize('path,package,expected', [
-    (
-            'some_dir/package/my_youtube_uploader/youtube_uploader.py',
-            {'pkg_dir': 'some_dir', 'pkg_name': 'package'},
-            'package'
-    ),
-    (
-            'package/my_youtube_uploader/youtube_uploader.py',
-            {'pkg_name': 'package'},
-            'package'),
-    (
-            'package',
-            {'pkg_name': 'package'},
-            'package'
-    ),
-    (
-            'tamere_en_slip/tamere_en_slip_lib/sextape.gropython',
-            {'pkg_name': 'package'},
-            None
-    )
+    ('some_dir/package/my_youtube_uploader/youtube_uploader.py',
+     {'pkg_dir': 'some_dir', 'pkg_name': 'package'},
+     'package'),
+    ('package/my_youtube_uploader/youtube_uploader.py',
+     {'pkg_name': 'package'},
+     'package'),
+    ('package',
+     {'pkg_name': 'package'},
+     'package'),
+    ('tamere_en_slip/tamere_en_slip_lib/sextape.gropython',
+     {'pkg_name': 'package'},
+     None)
 ])
 def test_package_from_path(path, package, expected):
     packages = {package['pkg_name']: package}
@@ -62,7 +55,7 @@ def test_package_from_path(path, package, expected):
 
 
 def test_get_package_requirements(mocker):
-    repo_path = '/repo/'
+    l_repo_path = '/repo/'
     packages = {'my_biglibrary': {'pkg_dir': 'some_dir', 'pkg_name': 'my_biglibrary', 'type': 'library'},
                 'my_smalllibrary': {'pkg_name': 'my_smalllibrary', 'type': 'library'},
                 'package1': {'pkg_name': 'package1', 'pkg_dir': 'some_pkg_dir'},
@@ -75,7 +68,10 @@ def test_get_package_requirements(mocker):
 
     package_name = 'package1'
 
-    requirements = get_package_requirements(package_name, packages, repo_path, restrict_requirements_types=['library'])
+    requirements = get_package_requirements(package_name,
+                                            packages,
+                                            l_repo_path,
+                                            restrict_requirements_types=['library'])
     assert requirements == {'my_biglibrary', 'my_smalllibrary'}
 
 
@@ -145,34 +141,6 @@ def test_gen_dependencies_level(mocker, cycle, draw):
 
 def test_dependency_layout():
     dependencies_layout([[['A'], ['E', 'B'], ['C']], [['D']]])
-
-"""
-@pytest.mark.parametrize('output_type', [None, "png", "dot"])
-def test_gplot(mocker, output_type):
-    mocker.patch("loktar.dependency.nx")
-    from mock import Mock
-    gplot(Mock(), [[['A'], ['E', 'B'], ['C']], [['D']]], output_type=output_type, save_path="/foobar")
-"""
-
-"""
-@pytest.mark.parametrize("packages", [
-    {
-        'package': {'exclude_dependencies_only_on_keywords': ['CLN', 'BLD']},
-        'package2': {'exclude_dependencies_only_on_keywords': []},
-    }
-])
-@pytest.mark.parametrize("dict_message_files", [
-    {'CLN/BLD: Cleaned some files. I do not care about dependencies': ['package/modified.py']},
-    {'BUG: Fix an awesome bug': ['package/modified.py']}
-])
-@pytest.mark.parametrize("modified_packages", [{'package'}])
-def test_get_excluded_deps(packages, dict_message_files, modified_packages):
-    result = get_excluded_deps(packages, dict_message_files, modified_packages)
-    if any("CLN" in i or "BLD" in i for i in dict_message_files.keys()):
-        assert result == {"package"}
-    else:
-        assert result == set()
-"""
 
 
 @pytest.mark.parametrize('exclude', [True, False])

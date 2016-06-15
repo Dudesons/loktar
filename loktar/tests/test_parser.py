@@ -21,4 +21,3 @@ def test_parse_statuses():
                     "success" if index % 2 else "failed")
          for index, item in enumerate(build_params)]
     ) == ({'my_client_claims', 'swagger-rest-microservice'}, {'swagger-rest-microservice', 'The Package'})
-

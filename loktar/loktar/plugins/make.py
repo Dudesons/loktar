@@ -1,26 +1,32 @@
-from loktar.plugin import ComplexPlugin
+from loktar.plugin import SimplePlugin
 
 
 def run(*args, **kwargs):
-    Make(args[0]).run()
+    try:
+        Make(args[0], args[1]).run()
+    except IndexError:
+        print(Make.__init__.__doc__)
+        raise
 
 
-class Make(ComplexPlugin):
-        def __init__(self, package_info):
-            ComplexPlugin.__init__(self, package_info,
-                                   {
-                                       "command": {
-                                           "run": "make ci",
-                                           "clean": "make clean"
-                                       }
-                                   })
-            self.timeline = {
-                60: self.get_results,
-            }
+class Make(SimplePlugin):
+        def __init__(self, package_info, remote):
+            """Plugin for launching test from a make file with make ci & make clean
+
+                Args:
+                    package_info (dict): Contains information about the package to execute inside the plugin
+                    remote (bool): Define if the plugin will be execute in remote or not
+
+            """
+            SimplePlugin.__init__(self, package_info,
+                                  {
+                                      "command": {
+                                          "run": "make ci",
+                                          "clean": "make clean"
+                                      }
+                                  },
+                                  remote=remote)
 
         def run(self):
-            self._run()
-
-        def get_results(self):
-            print 'ToDo'
-
+            self._base_run()
+            self._base_clean()

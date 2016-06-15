@@ -5,7 +5,7 @@ from loktar.serialize import unserialize
 
 
 @pytest.mark.parametrize("item", ["http://foobar.com?p=5",
-                                  {"toto":5},
+                                  {"toto": 5},
                                   4,
                                   ["plop", 'tutu'],
                                   {"t", "p"},

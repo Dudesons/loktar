@@ -51,4 +51,3 @@ def test_strategy_run_fail_on_runner(mocker, package, run_type):
 
     with pytest.raises(Exception):
         strategy_runner(package, run_type)
-

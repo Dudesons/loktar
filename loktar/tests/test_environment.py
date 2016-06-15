@@ -1,4 +1,5 @@
 import pytest
+
 from loktar.environment import get_config
 from loktar.environment import prepare_test_env
 from loktar.environment import PrepareEnvFail
@@ -32,12 +33,10 @@ def test_prepare_test_env(mocker, branch):
     "tar -czf "
 ])
 def test_prepare_test_env_prepare_env_fail(mocker, branch, when_to_fail):
-    
+
     def fake_exec_command_with_retry(cmd, *args, **kwargs):
         if when_to_fail in cmd:
             return False
-        else:
-            True
 
     mocker.patch("loktar.environment.os")
     mocker.patch("loktar.environment.lcd")
@@ -45,4 +44,3 @@ def test_prepare_test_env_prepare_env_fail(mocker, branch, when_to_fail):
     mocker.patch("loktar.environment.exec_command_with_retry", side_effect=fake_exec_command_with_retry)
     with pytest.raises(PrepareEnvFail):
         prepare_test_env(branch)
-

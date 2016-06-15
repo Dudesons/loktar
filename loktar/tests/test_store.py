@@ -1,10 +1,10 @@
 import pytest
-import re
 
 from loktar.exceptions import UnknownStorageMethod
-from loktar.store import get_back_test_env
 from loktar.store import _get_back_test_env_from_s3
+from loktar.store import get_back_test_env
 from loktar.store import store_test_env
+
 from loktar.store import _store_test_env_on_s3
 
 

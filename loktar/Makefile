@@ -63,9 +63,9 @@ coverage:
 	PYTHONPATH=$(shell pwd) py.test -s --cov=loktar --cov-report html --cov-report xml --cov-config .coveragerc tests/
 
 docs:
-	rm -f docs/traxit_ci.rst
+	rm -f docs/loktar.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ traxit_ci -e
+	sphinx-apidoc -o docs/ loktar -e
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 
