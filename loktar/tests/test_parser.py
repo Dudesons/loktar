@@ -16,8 +16,9 @@ def test_parse_statuses():
                     ('swagger-rest-microservice', 'Is a Test'),
                     ('my_client_claims', 'Is a Test')]
 
-    parse_statuses(
+    assert parse_statuses(
         [FakeStatus(build_params_to_context(item[0], item[1]),
                     "success" if index % 2 else "failed")
          for index, item in enumerate(build_params)]
-    )
+    ) == ({'my_client_claims', 'swagger-rest-microservice'}, {'swagger-rest-microservice', 'The Package'})
+

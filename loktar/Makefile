@@ -57,7 +57,7 @@ lint:
 	flake8 loktar tests
 
 test:
-	PYTHONPATH=$(shell pwd) py.test tests/
+	PYTHONPATH=$(shell pwd) py.test -s tests/
 
 coverage:
 	PYTHONPATH=$(shell pwd) py.test -s --cov=loktar --cov-report html --cov-report xml --cov-config .coveragerc tests/

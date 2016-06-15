@@ -1,6 +1,7 @@
 from mock import MagicMock
 import pytest
 
+from loktar.scm import fetch_github_file
 from loktar.scm import Github
 
 
@@ -117,3 +118,10 @@ def test_github(mock_github_obj):
     last_commit, statuses = scm.get_last_statuses_from_pull_request(42)
     assert statuses == ['status1', 'status2']
     scm.get_last_commits_from_pull_request(42)
+
+
+def test_fetch_github_file(mocker):
+    mocker.patch("loktar.scm.requests")
+    mocker.patch("loktar.scm.StringIO")
+
+    fetch_github_file("https://github.com/foo/bar/titi", "MY_AWESOME_TOKEN")
