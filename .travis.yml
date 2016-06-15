@@ -9,6 +9,8 @@ before_install:
 install:
   - pip install -r loktar/requirements.txt
   - pip install -r loktar/test_requirements.txt
+  - pip install coveralls
+
 # command to run tests
 script: cd loktar && make coverage
 
