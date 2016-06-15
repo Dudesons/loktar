@@ -1,0 +1,8 @@
+language: python
+python:
+  - "2.7"
+install:
+  - pip install -r loktar/requirements.txt
+  - pip install -r loktar/test_requirements.txt
+# command to run tests
+script: cd loktar && make test
