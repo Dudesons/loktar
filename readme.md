@@ -1,5 +1,8 @@
 # Loktar, the hybrid Continuous Integration
 
+[![Coverage Status](https://coveralls.io/repos/github/Dudesons/loktar/badge.svg?branch=try-travis)](https://coveralls.io/github/Dudesons/loktar?branch=try-travis)
+[![Build Status](https://travis-ci.org/Dudesons/loktar.svg?branch=master)](https://travis-ci.org/Dudesons/loktar)
+
 ## Intro
 
 Loktar is a Continuous Integration project who can managed microservices environment and hybrid environment (python, java ...).

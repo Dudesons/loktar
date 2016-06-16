@@ -1,8 +1,17 @@
 language: python
 python:
   - "2.7"
+  
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
+
 install:
   - pip install -r loktar/requirements.txt
   - pip install -r loktar/test_requirements.txt
+  - pip install coveralls
+
 # command to run tests
-script: cd loktar && make test
+script: cd loktar && make coverage
+
+after_success: coveralls
