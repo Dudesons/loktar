@@ -6,12 +6,13 @@ from loktar.log import Log
 from loktar.plugin import find_plugin
 
 
-def strategy_runner(package, run_type):
+def strategy_runner(package, run_type, remote=False):
     """Run the packaging functions
 
         Args:
             package (dict): package_config
             run_type (str): Represent the strategy to run on a package (test or artifact)
+            remote (bool): Represent if the plugin is executed in remote or not, default value: False
 
         Raises:
             CITestFail: some error occurred during the test
@@ -34,7 +35,7 @@ def strategy_runner(package, run_type):
         raise
 
     try:
-        runner.run(package)
+        runner.run((package, remote))
     except Exception as e:
         logger.error(repr(e))
         raise params["exception"]
