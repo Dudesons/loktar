@@ -13,7 +13,7 @@ def test_strategy_run(mocker, package, run_type, remote):
             pass
 
         @staticmethod
-        def run(self):
+        def run():
             print("This is an awesome plugin")
 
     mocker.patch("loktar.strategy_run.find_plugin", return_value=Fake)
