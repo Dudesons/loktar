@@ -2,6 +2,9 @@ from loktar.plugin import SimplePlugin
 
 
 def run(*args, **kwargs):
+    """This is a wrapper for running the plugin
+
+    """
     try:
         Make(args[0], args[1]).run()
     except IndexError:
