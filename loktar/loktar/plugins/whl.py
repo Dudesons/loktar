@@ -35,7 +35,7 @@ class Whl(ComplexPlugin):
                                    },
                                    remote=remote)
             self.timeline = {
-                10: self.get_version,
+                10: self.get_next_version,
                 40: self.release
             }
             self.pypicloud = PypicloudClient()
@@ -46,8 +46,10 @@ class Whl(ComplexPlugin):
             """
             self._run()
 
-        def get_version(self):
-            pypicloud = PypicloudClient()
+        def get_next_version(self):
+            """Get the next version for the current package
+
+            """
             if self.package_info["mode"] == "master":
                 try:
                     self.share_memory["latest_version"] = str(int(filter(
@@ -55,7 +57,7 @@ class Whl(ComplexPlugin):
                         sorted(
                             map(
                                 lambda pkg: pkg["version"],
-                                pypicloud.get_versions(self.package_info["pkg_name"])
+                                self.pypicloud.get_versions(self.package_info["pkg_name"])
                             ),
                             reverse=True
                         )
@@ -64,6 +66,7 @@ class Whl(ComplexPlugin):
                     self.share_memory["latest_version"] = 1
             else:
                 self.share_memory["latest_version"] = "0.{0}".format(self.package_info["mode"])
+                self.pypicloud.delete_package(self.share_memory["latest_version"])
 
         def release(self):
             """Create & upload the package
