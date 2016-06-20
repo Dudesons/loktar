@@ -27,7 +27,7 @@ class Whl(ComplexPlugin):
                     remote (bool): Define if the plugin will be execute in remote or not
 
                 Raises:
-                    WheelPackageFail: when one of the steps for packaging or uploading the package failed
+                    CIBuildPackageFail: when one of the steps for packaging or uploading the package failed
             """
             ComplexPlugin.__init__(self, package_info,
                                    {
@@ -69,7 +69,7 @@ class Whl(ComplexPlugin):
                     self.share_memory["latest_version"] = 1
             else:
                 self.share_memory["latest_version"] = "0.{0}".format(self.package_info["mode"])
-                self.pypicloud.delete_package(self.share_memory["latest_version"])
+                self.pypicloud.delete_package(self.package_info["pkg_name"], self.share_memory["latest_version"])
 
         def release(self):
             """Create & upload the package

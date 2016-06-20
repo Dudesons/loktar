@@ -2,6 +2,7 @@ import pytest
 
 from loktar.exceptions import CIBuildPackageFail
 from loktar.plugins.whl import run
+from loktar.plugins.whl import Whl
 
 
 @pytest.mark.parametrize("mode", ["master", "foobar"])
@@ -34,3 +35,9 @@ def test_plugins_whl_fail_on_release(mocker, mode, remote):
     mocker.patch("loktar.plugin.exe")
     with pytest.raises(CIBuildPackageFail):
         run({"pkg_name": "foobar", "mode": mode, "package_location": "/tmp"}, remote)
+
+
+def test_plugins_whl_fail_on_call():
+    with pytest.raises(IndexError):
+        output = run()
+        assert output == Whl.__init__.__doc__
