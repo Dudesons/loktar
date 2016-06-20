@@ -27,7 +27,7 @@ class Whl(ComplexPlugin):
                     remote (bool): Define if the plugin will be execute in remote or not
 
                 Raises:
-                    WheelPackageFail: when one of the steps for packaging or uploading the package failed
+                    CIBuildPackageFail: when one of the steps for packaging or uploading the package failed
             """
             ComplexPlugin.__init__(self, package_info,
                                    {
