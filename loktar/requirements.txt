@@ -16,4 +16,4 @@ ssh-import-id==3.21
 boto==2.39.0
 cffi==1.6.0
 pycrypto==2.6.1
-pypicloud_client==1
+pypicloud_client==2
