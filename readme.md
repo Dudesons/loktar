@@ -23,6 +23,14 @@ Artifact type in output:
  * Wheel package
  * Debian package
 
+## What's in this repo ?
+
+ * loktar: this is the core part of the project
+ * loktar_api (experimental) : this an experimental api rest
+ * loktar_init (experimental): this is a service who prepares the test archive, dependency graph ...
+ * loktar_worker_manager (experimental): this is a service who manages the launch of jobs following the dep graph
+
+Actually the main effort is on the loktar part.
 
 ## Contributing to Loktar
 
