@@ -3,11 +3,14 @@ from pypicloud_client.client import PypicloudClient
 from loktar.cmd import exe
 from loktar.cmd import exec_command_with_retry
 from loktar.environment import MAX_RETRY_PYTHON_UPLOAD
-from loktar.exceptions import WheelPackageFail
+from loktar.exceptions import CIBuildPackageFail
 from loktar.plugin import ComplexPlugin
 
 
 def run(*args, **kwargs):
+    """This is a wrapper for running the plugin
+
+    """
     try:
         Whl(args[0], args[1]).run()
     except IndexError:
@@ -76,10 +79,10 @@ class Whl(ComplexPlugin):
                 # Edit the package version
                 if not exe("sed -i 's/VERSION = .*/VERSION = \"{0}\"/g' setup.py"
                            .format(self.share_memory["latest_version"]), remote=self.remote):
-                    raise WheelPackageFail("Failed to update the version")
+                    raise CIBuildPackageFail("Failed to update the version")
 
                 # Build package
                 if not exec_command_with_retry("make release", max_retry=MAX_RETRY_PYTHON_UPLOAD, remote=self.remote):
-                    raise WheelPackageFail('Release failed')
+                    raise CIBuildPackageFail("Release failed for the wheel package")
 
-                self.logger.info('Wheel package built & uploaded')
+                self.logger.info("Wheel package built & uploaded")
