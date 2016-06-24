@@ -89,7 +89,7 @@ def test_plugins_whl_fail_on_call():
             {
                 "name": "flywheel",
                 "last_modified": 1390207478,
-                "version": "0-foo-bar",
+                "version": "0.foo-bar",
                 "url": "https://pypi.s3.amazonaws.com/81f2/flywheel-0.1.0-21-g4a739b0.tar.gz",
                 "filename": "flywheel-0.1.0-21-g4a739b0.tar.gz"
             }
@@ -121,7 +121,7 @@ def test_plugins_whl_fail_on_call():
             {
                 "name": "flywheel",
                 "last_modified": 1389945600,
-                "version": "0-foobar-bar",
+                "version": "0.foobar-bar",
                 "url": "https://pypi.s3.amazonaws.com/34c2/",
                 "filename": "flywheel-0-foobar-bar.tar.gz"
             },
@@ -151,7 +151,7 @@ def test_plugins_whl_get_next_version(monkeypatch, mode, pypicloud_get_versions,
         else:
             expected_value = "5"
     else:
-        expected_value = "0-foo-bar"
+        expected_value = "0.foo-bar"
 
     plugin.get_next_version()
 
