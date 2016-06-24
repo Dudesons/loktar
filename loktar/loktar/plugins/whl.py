@@ -55,19 +55,25 @@ class Whl(ComplexPlugin):
             """
             if self.package_info["mode"] == "master":
                 try:
-                    self.share_memory["latest_version"] = str(int(filter(
-                        lambda pkg: pkg.isdigit(),
-                        sorted(
-                            map(
-                                lambda pkg: pkg["version"],
-                                self.pypicloud.get_versions(self.package_info["pkg_name"])
-                            ),
-                            reverse=True
+                    versions = filter(
+                        lambda pkg_version: int(pkg_version.isdigit()),
+                        map(
+                            lambda pkg: pkg["version"],
+                            self.pypicloud.get_versions(self.package_info["pkg_name"])
                         )
-                    )[0]) + 1)
+                    )
+
+                    self.share_memory["latest_version"] = str(
+                        sorted(
+                            [int(version) for version in versions],
+                            reverse=True
+                        )[0] + 1
+                    )
+
                 except IndexError:
                     self.share_memory["latest_version"] = 1
             else:
+                self.package_info["mode"] = self.package_info["mode"].replace("_", "-")
                 self.share_memory["latest_version"] = "0.{0}".format(self.package_info["mode"])
                 self.pypicloud.delete_package(self.package_info["pkg_name"], self.share_memory["latest_version"])
 
