@@ -16,6 +16,7 @@ def os_environ(mocker):
     mocker.patch.dict("os.environ", environ)
     return environ
 
+
 @pytest.mark.parametrize("mode", ["master", "foobar"])
 @pytest.mark.parametrize("remote", [True, False])
 def test_plugins_whl(mocker, mode, remote):
@@ -146,12 +147,12 @@ def test_plugins_whl_get_next_version(monkeypatch, mode, pypicloud_get_versions,
         if len(pypicloud_get_versions) == 1:
             expected_value = "1"
         elif len(pypicloud_get_versions) == 3:
-            expected_value = "11"
+            expected_value = "12"
         else:
-            expected_value = "4"
+            expected_value = "5"
     else:
         expected_value = "0-foo-bar"
 
     plugin.get_next_version()
 
-    assert plugin.share_memory["latest_version"] == expected_value
+    assert str(plugin.share_memory["latest_version"]) == expected_value
