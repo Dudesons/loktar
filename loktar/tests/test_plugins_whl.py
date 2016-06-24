@@ -126,7 +126,7 @@ def test_plugins_whl_fail_on_call():
             },
     )
 ])
-def test_plugins_whl_get_ext_version(monkeypatch, mode, pypicloud_get_versions, os_environ):
+def test_plugins_whl_get_next_version(monkeypatch, mode, pypicloud_get_versions, os_environ):
     monkeypatch.setattr(PypicloudClient, "get_versions", lambda *args: pypicloud_get_versions)
 
     plugin = Whl(
@@ -152,6 +152,6 @@ def test_plugins_whl_get_ext_version(monkeypatch, mode, pypicloud_get_versions, 
     else:
         expected_value = "0-foo-bar"
 
-    plugin.get_next_versions()
+    plugin.get_next_version()
 
     assert plugin.share_memory["latest_version"] == expected_value
