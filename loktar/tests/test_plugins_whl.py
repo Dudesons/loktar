@@ -6,6 +6,16 @@ from loktar.plugins.whl import run
 from loktar.plugins.whl import Whl
 
 
+@pytest.fixture()
+def os_environ(mocker):
+    environ = dict(
+        PYPICLOUD_HOST="host",
+        PYPICLOUD_USER="root",
+        PYPICLOUD_PASSWORD="toor"
+    )
+    mocker.patch.dict("os.environ", environ)
+    return environ
+
 @pytest.mark.parametrize("mode", ["master", "foobar"])
 @pytest.mark.parametrize("remote", [True, False])
 def test_plugins_whl(mocker, mode, remote):
@@ -116,7 +126,7 @@ def test_plugins_whl_fail_on_call():
             },
     )
 ])
-def test_plugins_whl_get_ext_version(monkeypatch, mode, pypicloud_get_versions):
+def test_plugins_whl_get_ext_version(monkeypatch, mode, pypicloud_get_versions, os_environ):
     monkeypatch.setattr(PypicloudClient, "get_versions", lambda *args: pypicloud_get_versions)
 
     plugin = Whl(
