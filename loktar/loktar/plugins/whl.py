@@ -68,6 +68,7 @@ class Whl(ComplexPlugin):
                 except IndexError:
                     self.share_memory["latest_version"] = 1
             else:
+                self.package_info["mode"] = self.package_info["mode"].replace("_", "-")
                 self.share_memory["latest_version"] = "0.{0}".format(self.package_info["mode"])
                 self.pypicloud.delete_package(self.package_info["pkg_name"], self.share_memory["latest_version"])
 
