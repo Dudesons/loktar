@@ -19,7 +19,7 @@ all: lint coverage docs
 
 ci: lint test
 
-clean: clean-build clean-pyc clean-docker
+clean: clean-build clean-pyc clean-docker clean-test
 
 clean-docker:
 	docker-compose kill
