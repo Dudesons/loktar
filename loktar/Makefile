@@ -58,7 +58,7 @@ docs:
 	# sphinx-apidoc -o docs/ loktar -e
 	# $(MAKE) -C docs clean
 	# $(MAKE) -C docs html
-	@echo 'TODO gen doc
+	@echo 'to do gen doc'
 
 release: clean build
 	docker-compose run --no-deps loktar python setup.py bdist_wheel upload -r pypi
