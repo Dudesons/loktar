@@ -139,7 +139,7 @@ def test_plugins_whl_get_next_version(monkeypatch, mode, pypicloud_get_versions,
             "pkg_type": "whl",
             "package_location": "/tmp/490847a2-326c-41c6-abb6-5765fc7544b3",
             "mode": mode
-            
+
         },
         False
     )
