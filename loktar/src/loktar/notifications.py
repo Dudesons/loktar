@@ -1,8 +1,14 @@
 from github import Github
+from slacker import Error
+from slacker import Slacker
 
 from loktar.decorators import retry
 from loktar.environment import GITHUB_INFO
+from loktar.environment import SLACK_INFO
+from loktar.exceptions import NotificationError
 from loktar.log import Log
+
+logger = Log()
 
 
 @retry
@@ -28,7 +34,6 @@ def define_job_status_on_github_commit(commit_id,
         organization (str, None): the organization of the repository target
         repository (str, None): the repository target
     """
-    logger = Log()
     if commit_id is not None:
         connexion = Github(GITHUB_INFO['login']['user'] if GITHUB_INFO['login']['user'] is not None else user,
                            GITHUB_INFO['login']['password']
@@ -66,3 +71,25 @@ def define_job_status_on_github_commit(commit_id,
         logger.info('The job status is: {0}'.format(state))
     else:
         logger.info('Notifcation on github off')
+
+
+@retry
+def send_message_to_slack(message, **kwargs):
+    slack_client = Slacker(SLACK_INFO["token"] if SLACK_INFO["token"] else kwargs.get("token", None))
+
+    try:
+        response = slack_client.chat.post_message(
+            SLACK_INFO["channel"] if SLACK_INFO["channel"] else kwargs.get("channel", None),
+            message
+        )
+
+        assert response.successful is True
+    except Error as e:
+        logger.error("Error for sending message to slack because : {0}".format(str(e)))
+        raise NotificationError(str(e))
+    except AssertionError:
+        logger.error("Unknown error for sending message to slack : {0}".format(response.body))
+        raise NotificationError(response.body)
+
+    logger.info("Message sent to slack")
+    return response.body

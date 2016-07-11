@@ -88,6 +88,11 @@ AWS = {
 
 PLUGINS_LOCATIONS = os.getenv("{0}PLUGINS_LOCATIONS".format(PREFIX_ENV_VAR), [])
 
+SLACK_INFO = {
+    "token": os.getenv("{0}SLACK_INFO_TOKEN".format(PREFIX_ENV_VAR), None),
+    "channel": os.getenv("{0}SLACK_INFO_CHANNEL".format(PREFIX_ENV_VAR), None)
+}
+
 
 def prepare_test_env(branch, github_organization=None, github_repository=None):
     """Prepare the test environment

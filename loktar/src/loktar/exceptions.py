@@ -56,3 +56,7 @@ class ImportPluginError(Exception):
 
 class UnknownStorageMethod(Exception):
     """Exception raised by if the storage method doesn't exist"""
+
+
+class NotificationError(Exception):
+    """Exception raised by if the storage method doesn't exist"""
