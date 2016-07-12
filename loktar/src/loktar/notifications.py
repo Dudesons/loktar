@@ -75,6 +75,36 @@ def define_job_status_on_github_commit(commit_id,
 
 @retry
 def send_message_to_slack(message, **kwargs):
+    """Send a message to a slack channel
+
+        Args:
+            message (str): this is the message to send to slack
+
+        Keyword Args:
+            token (str): this is the slack token it can provide from environment variable or the kwargs
+            channel(str): this is the slack channel it can provide from environment variable or the kwargs
+
+        Raises:
+            NotificationError: this is raised when the token or the channel are not set or an environment problem
+
+        Returns:
+            If all is good the function return the response from slack
+            example:
+                {
+                    "channel": "my chan",
+                    "message":
+                            {
+                                "bot_id": "BOT ID",
+                                "sbtype": "bot_message",
+                                "text": "Hello World",
+                                "ts": "1468242279.000003",
+                                "type": "message",
+                                "username": "bot"
+                            },
+                    "ok": True,
+                    "ts": "1468242279.000003"
+                }
+    """
     slack_client = Slacker(SLACK_INFO["token"] if SLACK_INFO["token"] else kwargs.get("token", None))
 
     try:
