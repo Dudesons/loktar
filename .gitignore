@@ -65,3 +65,5 @@ target/
 .idea/
 
 *~
+
+.DS_STORE
