@@ -88,9 +88,13 @@ AWS = {
 
 PLUGINS_LOCATIONS = os.getenv("{0}PLUGINS_LOCATIONS".format(PREFIX_ENV_VAR), [])
 
-SLACK_INFO = {
-    "token": os.getenv("{0}SLACK_INFO_TOKEN".format(PREFIX_ENV_VAR), None),
-    "channel": os.getenv("{0}SLACK_INFO_CHANNEL".format(PREFIX_ENV_VAR), None)
+SLACK = {
+    "token": os.getenv("{0}SLACK_TOKEN".format(PREFIX_ENV_VAR), None),
+    "channel": os.getenv("{0}SLACK_CHANNEL".format(PREFIX_ENV_VAR), None)
+}
+
+QUAY = {
+    "limit": os.getenv("{0}QUAY_LIMIT".format(PREFIX_ENV_VAR), 100)
 }
 
 
