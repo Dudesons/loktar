@@ -29,7 +29,7 @@ def strategy_runner(package, run_type, remote=False):
         if run_type == "test" else {"type": "pkg_type", "exception": CIBuildPackageFail}
     plugins_location = PLUGINS_LOCATIONS.split(",") if type(PLUGINS_LOCATIONS) is str else PLUGINS_LOCATIONS
     try:
-        runner = find_plugin(package[params["type"]], plugins_location)
+        runner = find_plugin(package[params["type"]], run_type, plugins_location)
 
     except ImportPluginError:
         raise
