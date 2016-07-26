@@ -1,0 +1,6 @@
+version: "2"
+
+services:
+
+  storage_proxy:
+    build: .
