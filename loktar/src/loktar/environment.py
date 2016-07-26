@@ -97,12 +97,26 @@ QUAY = {
     "limit": os.getenv("{0}QUAY_LIMIT".format(PREFIX_ENV_VAR), 100)
 }
 
+RETRY_HTTP = {
+    "multiplier": os.getenv("{0}RETRY_HTTP_MULTIPLIER".format(PREFIX_ENV_VAR), 1.5),
+    "interval": os.getenv("{0}RETRY_HTTP_INTERVAL".format(PREFIX_ENV_VAR), 0.5),
+    "randomization_factor": os.getenv("{0}RETRY_HTTP_RANDOMIZATION_FACTOR".format(PREFIX_ENV_VAR), 0.5),
+    "max_sleep_time": os.getenv("{0}RETRY_HTTP_MAX_SLEEP_TIME".format(PREFIX_ENV_VAR), 180)
+}
 
-def prepare_test_env(branch, github_organization=None, github_repository=None):
+STORAGE_PROXY = {
+    "host": os.getenv("{0}STORAGE_PROXY_HOST".format(PREFIX_ENV_VAR), None),
+    "port": os.getenv("{0}STORAGE_PROXY_PORT".format(PREFIX_ENV_VAR), None)
+}
+
+
+def prepare_test_env(branch, **kwargs):
     """Prepare the test environment
 
     Args:
         branch (str): Name of the branch the repository should be checkout to.
+
+    Keyword Args:
         github_organization (str): this is the github organization for get back the repository, default value None.
                                    Also can be set by environment variable LOKTAR_GITHUB_INFO_ORGANIZATION
         github_repository (str): this is the target repository to download, default value None
@@ -117,20 +131,17 @@ def prepare_test_env(branch, github_organization=None, github_repository=None):
     archive = "{0}.tar.gz".format(unique_name_dir)
     logger.info("Preparing the test environment")
 
+    github_organization = kwargs.get("github_organization", GITHUB_INFO["organization"])
+    github_repository = kwargs.get("github_repository", GITHUB_INFO["repository"])
+
     os.mkdir(unique_path_dir)
     try:
         if not exec_command_with_retry("git clone -b {0} --single-branch git@github.com:{1}/{2}.git {3}"
-                                       .format(branch,
-                                               GITHUB_INFO["organization"]
-                                               if github_organization is None else
-                                               github_organization,
-                                               GITHUB_INFO["repository"]
-                                               if github_repository is None else
-                                               github_repository,
-                                               unique_path_dir),
+                                       .format(branch, github_organization, github_repository, unique_path_dir),
                                        0,
                                        MAX_RETRY_GITHUB):
-            raise PrepareEnvFail
+            raise PrepareEnvFail("The git clone can't the repository: {}/{}, check if you have the correct crendentials"
+                                 .format(github_organization, github_repository))
 
         with lcd(unique_path_dir):
             if not exec_command_with_retry("git fetch origin master", 0, MAX_RETRY_GITHUB):
