@@ -1,4 +1,4 @@
-FROM loktar/base:0
+FROM loktar/base:1
 
 COPY src /src
 

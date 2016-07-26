@@ -26,9 +26,9 @@ clean-docker:
 	docker-compose rm --all -fv
 
 clean-build:
-	rm -rf build/
-	rm -rf dist/
-	rm -rf *egg*/
+	rm -rf ./src/build/
+	rm -rf ./src/dist/
+	rm -rf ./src/*egg*/
 
 clean-pyc:
 	find . -name '*.pyc' -exec rm -f {} +
@@ -46,7 +46,7 @@ lint:
 	docker-compose run --no-deps loktar flake8 loktar
 
 test:
-	docker-compose run loktar PYTHONPATH=$(shell pwd) py.test -s tests/
+	docker-compose run loktar py.test -s tests/
 
 
 coverage:
@@ -60,8 +60,11 @@ docs:
 	# $(MAKE) -C docs html
 	@echo 'to do gen doc'
 
+register: clean build
+	docker-compose -f docker-compose.yml -f docker-compose-release.yml run --no-deps loktar python setup.py register -r pypi
+
 release: clean build
-	docker-compose run --no-deps loktar python setup.py bdist_wheel upload -r pypi
+	docker-compose -f docker-compose.yml -f docker-compose-release.yml run --no-deps loktar python setup.py bdist_wheel upload -r pypi
 
 dist: clean
 	python setup.py sdist
