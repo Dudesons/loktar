@@ -16,6 +16,10 @@ RUN apt-get update && \
     apt-get remove -y python-pycparser && \
     apt-get install g++ -y
 
-COPY requirements.txt /
+COPY requirements.txt /base-components/requirements.txt
 
-RUN pip install -r /requirements.txt
+RUN pip install -r /base-components/requirements.txt
+
+COPY entrypoint.sh /
+
+RUN chmod 100 /entrypoint.sh
