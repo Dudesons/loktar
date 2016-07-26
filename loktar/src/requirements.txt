@@ -18,3 +18,5 @@ cffi==1.6.0
 pycrypto==2.6.1
 pypicloud_client==3
 slacker==0.9.21
+quay_client==5
+bravado==8.1.2

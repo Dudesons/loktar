@@ -92,24 +92,27 @@ def test_complex_plugin_fail_forbidden_timeline_key(mocker, example_plugin):
         test.run()
 
 
-def test_find_plugin(mocker):
+@pytest.mark.parametrize("plugin_type", ["test", "artifact"])
+def test_find_plugin(mocker, plugin_type):
     mocker.patch("loktar.plugin.importlib")
-    find_plugin("foo", ["/tmp/bar", "/toto/tutu"])
+    find_plugin("foo", plugin_type, ["/tmp/bar", "/toto/tutu"])
 
 
-def test_find_plugin_failed_on_first_import_but_find_a_plugin_in_plugin_path(mocker):
+@pytest.mark.parametrize("plugin_type", ["test", "artifact"])
+def test_find_plugin_failed_on_first_import_but_find_a_plugin_in_plugin_path(mocker, plugin_type):
     def fake_import(*args, **kwargs):
         if "loktar" in args[0]:
             raise ImportError
 
     mocker.patch("loktar.plugin.importlib.import_module", side_effect=fake_import)
-    find_plugin("foo", ["/tmp/bar", "/toto/tutu"])
+    find_plugin("foo", plugin_type, ["/tmp/bar", "/toto/tutu"])
 
 
-def test_find_plugin_failed_on_all_import(mocker):
+@pytest.mark.parametrize("plugin_type", ["test", "artifact"])
+def test_find_plugin_failed_on_all_import(mocker, plugin_type):
     def fake_import(*args, **kwargs):
         raise ImportError
 
     mocker.patch("loktar.plugin.importlib.import_module", side_effect=fake_import)
     with pytest.raises(ImportPluginError):
-        find_plugin("foo", ["/tmp/bar", "/toto/tutu"])
+        find_plugin("foo", plugin_type, ["/tmp/bar", "/toto/tutu"])

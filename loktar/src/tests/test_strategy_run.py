@@ -31,7 +31,7 @@ def test_strategy_run_fail_on_value_error_run_type(package):
 @pytest.mark.parametrize("run_type", ["test", "build"])
 def test_strategy_run_fail_on_find_plugin(mocker, package, run_type):
     def fake_import(*args, **kwargs):
-        raise ImportPluginError
+        raise ImportPluginError("fake import")
 
     mocker.patch("loktar.strategy_run.find_plugin", side_effect=fake_import)
     with pytest.raises(ImportPluginError):

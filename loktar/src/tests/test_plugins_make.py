@@ -1,8 +1,8 @@
 import pytest
 
 from loktar.exceptions import CITestFail
-from loktar.plugins.make import Make
-from loktar.plugins.make import run
+from loktar.plugins.test.make import Make
+from loktar.plugins.test.make import run
 
 
 @pytest.mark.parametrize("remote", [True, False])

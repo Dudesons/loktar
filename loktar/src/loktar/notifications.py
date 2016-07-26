@@ -4,7 +4,7 @@ from slacker import Slacker
 
 from loktar.decorators import retry
 from loktar.environment import GITHUB_INFO
-from loktar.environment import SLACK_INFO
+from loktar.environment import SLACK
 from loktar.exceptions import NotificationError
 from loktar.log import Log
 
@@ -105,11 +105,11 @@ def send_message_to_slack(message, **kwargs):
                     "ts": "1468242279.000003"
                 }
     """
-    slack_client = Slacker(SLACK_INFO["token"] if SLACK_INFO["token"] else kwargs.get("token", None))
+    slack_client = Slacker(SLACK["token"] if SLACK["token"] else kwargs.get("token", None))
 
     try:
         response = slack_client.chat.post_message(
-            SLACK_INFO["channel"] if SLACK_INFO["channel"] else kwargs.get("channel", None),
+            SLACK["channel"] if SLACK["channel"] else kwargs.get("channel", None),
             message
         )
 

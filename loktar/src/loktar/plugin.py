@@ -14,20 +14,19 @@ from loktar.log import Log
 
 
 class SimplePlugin(object):
-    def __init__(self, package_info, config, remote=False):
+    def __init__(self, package_info, config, **kwargs):
         """Constructor for the SimplePlugin
 
             Args:
                 package_info (dict): represent all informations for the target package in the config.json
                 config (dict): this is the configuration plugin. It contains 2 keys 'run' & 'clean'.
-                remote (bool): Indicate if it has to execute commands in remote or not
 
             Raise:
                 SimplePluginErrorConfiguration: An error occurred when a key is missing in the configuration
         """
         self.logger = Log()
         self.config = config
-        self.remote = remote
+        self.remote = kwargs.get("remote", False)
         self.package_info = package_info
         self.cwd = lcd if self.remote is False else cd
 
@@ -47,7 +46,8 @@ class SimplePlugin(object):
         try:
             assert "run" in self.config["command"] and "clean" in self.config["command"]
         except AssertionError:
-            raise SimplePluginErrorConfiguration()
+            raise SimplePluginErrorConfiguration("The simple plugin configuration is incompleted,"
+                                                 " check if run & clean keys are filled")
 
     def __command(self, cmd):
         """Run the command indicated in the yaml file in the package directory
@@ -83,7 +83,7 @@ class ComplexPlugin(SimplePlugin):
         Raise:
             SimplePluginErrorConfiguration: An error occurred when a key is missing in the configuration
         """
-        SimplePlugin.__init__(self, package_info, config, remote=kwargs.get("remote", False))
+        SimplePlugin.__init__(self, package_info, config, **kwargs)
         self.timeline = dict()
         self.share_memory = dict()
         self.__origin = {
@@ -108,11 +108,12 @@ class ComplexPlugin(SimplePlugin):
             self.timeline[ref]()
 
 
-def find_plugin(plugin_name, plugin_locations):
+def find_plugin(plugin_name, plugin_type, plugin_locations):
     """Try to retrieve a plugin
 
         Args:
             plugin_name (str): the plugin to search
+            plugin_type (str): the type of plugin to fetch
             plugin_locations (list): locations of plugins
 
         Raises:
@@ -126,7 +127,7 @@ def find_plugin(plugin_name, plugin_locations):
     logger = Log()
 
     try:
-        return importlib.import_module("loktar.plugins.{0}".format(plugin_name))
+        return importlib.import_module("loktar.plugins.{}.{}".format(plugin_type, plugin_name))
     except ImportError as e:
         errors.append(str(e))
 
@@ -135,4 +136,4 @@ def find_plugin(plugin_name, plugin_locations):
     except ImportError as e:
         errors.append(str(e))
         logger.error("\n".join(errors))
-        raise ImportPluginError
+        raise ImportPluginError("\n".join(errors))

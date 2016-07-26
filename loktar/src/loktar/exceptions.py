@@ -1,62 +1,71 @@
-class CIJobFail(Exception):
+class LoktarException(Exception):
+    def __init__(self, message, *args):
+        Exception.__init__(self, message, *args)
+        self.reason = message
+        
+    def __str__(self):
+        return "{}: {}".format(type(self).__name__, self.reason)
+
+
+class CIJobFail(LoktarException):
     """Generic CI fail"""
 
 
-class PrepareEnvFail(Exception):
+class PrepareEnvFail(LoktarException):
     """Exception raised by a fail during environment preparation"""
 
 
-class CITestFail(Exception):
+class CITestFail(LoktarException):
     """Exception raised by a a fail during tests"""
 
 
-class CITestUnknown(Exception):
+class CITestUnknown(LoktarException):
     """Exception raised when the test is unknown"""
 
 
-class CIBuildPackageFail(Exception):
+class CIBuildPackageFail(LoktarException):
     """Exception raised when the build fails"""
 
 
-class CIPackageUnknown(Exception):
+class CIPackageUnknown(LoktarException):
     """Exception raised when the package is unknown"""
 
 
-class HTTPErrorCode(Exception):
+class HTTPErrorCode(LoktarException):
     """Exception raised by a failed call on Failed HTTP Requests"""
 
 
-class GitHubAPIFail(Exception):
+class GitHubAPIFail(LoktarException):
     """Exception raised by a failed call on Github API"""
 
 
-class JobIdUnknown(Exception):
+class JobIdUnknown(LoktarException):
     """Exception raised by a job id unknown"""
 
 
-class PullRequestCollision(Exception):
+class PullRequestCollision(LoktarException):
     """Exception raised by a failed call on Github API"""
 
 
-class FailDrawDepGraph(Exception):
+class FailDrawDepGraph(LoktarException):
     """Exception raised by a failed call on internal gplot function"""
 
 
-class ForbiddenTimelineKey(Exception):
+class ForbiddenTimelineKey(LoktarException):
     """Exception raised by conflict key in complex plugin"""
 
 
-class SimplePluginErrorConfiguration(Exception):
+class SimplePluginErrorConfiguration(LoktarException):
     """Exception raised by configuration error in simple plugin"""
 
 
-class ImportPluginError(Exception):
+class ImportPluginError(LoktarException):
     """Exception raised by if the plugin doesn't exist"""
 
 
-class UnknownStorageMethod(Exception):
+class UnknownStorageMethod(LoktarException):
     """Exception raised by if the storage method doesn't exist"""
 
 
-class NotificationError(Exception):
+class NotificationError(LoktarException):
     """Exception raised by if the storage method doesn't exist"""
