@@ -10,6 +10,7 @@ from loktar.plugins.artifact.docker import Docker
 @pytest.fixture(autouse=True)
 def os_environ(mocker):
     environ = dict(
+        LOKTAR_CI_HOST="https://myAwsomeCI",
         QUAY_HOST="https://myquay.io",
         QUAY_TOKEN="my_quay_token",
         QUAY_NAMESPACE="foobar_enterprise"
