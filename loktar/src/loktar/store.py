@@ -44,7 +44,8 @@ def store_artifact(store_type, target, **kwargs):
     if store_type == "s3":
         return _store_artifact_on_s3(target, kwargs.get("aws_region", None), kwargs.get("aws_bucket", None))
     else:
-        raise UnknownStorageMethod
+        raise UnknownStorageMethod("The storage: {} is unknown, open a PR for supporting the is storage"
+                                   .format(store_type))
 
 
 @retry
@@ -63,13 +64,13 @@ def _get_back_artifact_from_s3(target, aws_region, aws_bucket, store_path="/tmp"
         Returns
             A string who indicates where the artifact is stored (eg: s3:@:foobar foobar here is the artifact name)
     """
-    artifact_location = store_path + "/" + target
+    artifact_location_to_store = store_path + "/" + target.split("/")[-1]
     connexion = s3.connect_to_region(AWS["REGION"] if AWS["REGION"] is not None else aws_region)
     bucket = connexion.get_bucket(AWS["BUCKET"] if AWS["BUCKET"] is not None else aws_bucket)
     key = bucket.get_key(target)
-    key.get_contents_to_filename(artifact_location)
+    key.get_contents_to_filename(artifact_location_to_store)
 
-    return artifact_location
+    return artifact_location_to_store
 
 
 def get_back_test_env(test_env_location, **kwargs):
@@ -101,4 +102,5 @@ def get_back_artifact(storage_type, artifact, **kwargs):
                                           kwargs.get("aws_bucket", None),
                                           store_path=kwargs.get("store_path", "/tmp"))
     else:
-        raise UnknownStorageMethod
+        raise UnknownStorageMethod("The storage: {} is unknown, open a PR for supporting the is storage"
+                                   .format(storage_type))
