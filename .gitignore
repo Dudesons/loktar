@@ -67,3 +67,6 @@ target/
 *~
 
 .DS_STORE
+.DS_Store
+
+secret.env
