@@ -109,6 +109,10 @@ STORAGE_PROXY = {
     "port": os.getenv("{0}STORAGE_PROXY_PORT".format(PREFIX_ENV_VAR), None)
 }
 
+CI = {
+  "host": os.getenv("{0}CI_HOST".format(PREFIX_ENV_VAR), None)
+}
+
 
 def prepare_test_env(branch, **kwargs):
     """Prepare the test environment

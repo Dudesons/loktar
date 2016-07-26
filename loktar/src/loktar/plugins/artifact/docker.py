@@ -5,6 +5,7 @@ from uuid import uuid4
 
 from loktar.cmd import exe
 from loktar.environment import AWS
+from loktar.environment import CI
 from loktar.environment import QUAY
 from loktar.environment import STORAGE_PROXY
 from loktar.exceptions import CIBuildPackageFail
@@ -119,10 +120,11 @@ class _Quay(ComplexPlugin):
             """
             if self.package_info["build_info"]["build_type"] == "url":
                 extra_tags = [self.share_memory["latest_version"]] if self.package_info["mode"] == "master" else []
+                external_archive_url = "{}/{}".format(CI["host"], self.share_memory["archive_url"])
 
                 self.share_memory["build_id"] = self.quay.start_build_url(self.package_info["pkg_name"],
                                                                           self.package_info["mode"],
-                                                                          self.share_memory["archive_url"],
+                                                                          external_archive_url,
                                                                           extra_tags=extra_tags)
 
             elif self.package_info["build_info"]["build_type"] == "trigger":
