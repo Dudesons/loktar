@@ -1,0 +1,65 @@
+swagger: "2.0"
+
+info:
+  version: "0.1"
+  title: "Artifact"
+
+basePath: /v1
+
+paths:
+  /artifact/{storage_backend}/{bucket_name}:
+      get:
+        tags:
+          - get_artifact
+        description: "Give an uri for downloading an artifact from a storage backend like s3"
+        summary: "Give an uri for download an artifact"
+        operationId: storage_proxy.get_artifact
+        consumes:
+          - application/json
+        produces:
+          - application/json
+        parameters:
+          - in: path
+            name: storage_backend
+            description: The bucket where is store the artifact
+            required: true
+            type: string
+          - in: path
+            name: bucket_name
+            description: The bucket where is store the artifact
+            required: true
+            type: string
+          - in: query
+            name: artifact_name
+            required: true
+            description: The name of the artifact to get.
+            type: string
+        responses:
+          "201":
+            description: Created
+            schema:
+              $ref: "#/definitions/InfoArtifactSuccess"
+          "200":
+            description: Created
+            schema:
+              $ref: "#/definitions/InfoArtifactSuccess"
+          "400":
+            description: Invalid request
+            schema:
+              $ref: "#/definitions/InfoArtifactError"
+          "503":
+            description: Service unavailable
+            schema:
+              $ref: "#/definitions/InfoArtifactError"
+
+definitions:
+  InfoArtifactSuccess:
+    description: "The uri for getting the artifact"
+    example: "/artifact/ee3747cd32984bd0aa0ed3fec0a069a3.zip"
+    readOnly: false
+    type: string
+  InfoArtifactError:
+    description: "The message error"
+    example: "bucket undefined"
+    readOnly: false
+    type: string
