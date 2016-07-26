@@ -25,8 +25,9 @@ def test_plugins_docker(mocker, mode, remote, build_type):
     mocker.patch("loktar.plugins.artifact.docker.QuayClient")
     mocker.patch("loktar.plugins.artifact.docker.exe")
     mocker.patch("loktar.plugin.exe")
-    mocker.patch("loktar.plugins.artifact.docker.store_artifact")
-    
+    mocker.patch("loktar.plugins.artifact.docker.store_artifact", return_value="store:@:the_artifact.zip")
+    mocker.patch("loktar.plugins.artifact.docker.SwaggerClient")
+
     run({
         "pkg_name": "foobar",
         "mode": mode,
@@ -47,7 +48,8 @@ def test_plugins_docker_fail_on_init(mocker, mode, remote, build_type):
     mocker.patch("loktar.plugins.artifact.docker.QuayClient")
     mocker.patch("loktar.plugins.artifact.docker.exe")
     mocker.patch("loktar.plugin.exe")
-    mocker.patch("loktar.plugins.artifact.docker.store_artifact")
+    mocker.patch("loktar.plugins.artifact.docker.store_artifact", return_value="store:@:the_artifact.zip")
+    mocker.patch("loktar.plugins.artifact.docker.SwaggerClient")
 
     error_message = "the registry : 'best registry for ever' is not managed, create a pr for integrate this registry"
 
@@ -74,7 +76,8 @@ def test_plugins_docker_fail_on_create_archive(mocker, mode, remote, build_type)
     mocker.patch("loktar.plugins.artifact.docker.QuayClient")
     mocker.patch("loktar.plugins.artifact.docker.exe", return_value=False)
     mocker.patch("loktar.plugin.exe")
-    mocker.patch("loktar.plugins.artifact.docker.store_artifact")
+    mocker.patch("loktar.plugins.artifact.docker.store_artifact", return_value="store:@:the_artifact.zip")
+    mocker.patch("loktar.plugins.artifact.docker.SwaggerClient")
 
     with pytest.raises(CIBuildPackageFail):
         run({
@@ -96,7 +99,8 @@ def test_plugins_docker_fail_on_trigger_build(mocker, mode, remote):
     mocker.patch("loktar.plugins.artifact.docker.QuayClient")
     mocker.patch("loktar.plugins.artifact.docker.exe")
     mocker.patch("loktar.plugin.exe")
-    mocker.patch("loktar.plugins.artifact.docker.store_artifact")
+    mocker.patch("loktar.plugins.artifact.docker.store_artifact", return_value="store:@:the_artifact.zip")
+    mocker.patch("loktar.plugins.artifact.docker.SwaggerClient")
 
     with pytest.raises(CIBuildPackageFail):
         run({
@@ -144,7 +148,8 @@ def test_plugins_docker_fail_on_wait_build(mocker, mode, remote, build_type):
     mocker.patch("loktar.plugins.artifact.docker.QuayClient", side_effect=FakeQuayClient)
     mocker.patch("loktar.plugins.artifact.docker.exe")
     mocker.patch("loktar.plugin.exe")
-    mocker.patch("loktar.plugins.artifact.docker.store_artifact")
+    mocker.patch("loktar.plugins.artifact.docker.store_artifact", return_value="store:@:the_artifact.zip")
+    mocker.patch("loktar.plugins.artifact.docker.SwaggerClient")
 
     with pytest.raises(CIBuildPackageFail):
         run({
