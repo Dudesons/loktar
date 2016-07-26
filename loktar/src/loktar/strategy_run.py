@@ -37,5 +37,5 @@ def strategy_runner(package, run_type, remote=False):
     try:
         runner.run(package, remote)
     except Exception as e:
-        logger.error(repr(e))
-        raise params["exception"]
+        logger.error(str(e))
+        raise params["exception"](str(e))

@@ -46,7 +46,8 @@ class SimplePlugin(object):
         try:
             assert "run" in self.config["command"] and "clean" in self.config["command"]
         except AssertionError:
-            raise SimplePluginErrorConfiguration()
+            raise SimplePluginErrorConfiguration("The simple plugin configuration is incompleted,"
+                                                 " check if run & clean keys are filled")
 
     def __command(self, cmd):
         """Run the command indicated in the yaml file in the package directory
@@ -135,4 +136,4 @@ def find_plugin(plugin_name, plugin_type, plugin_locations):
     except ImportError as e:
         errors.append(str(e))
         logger.error("\n".join(errors))
-        raise ImportPluginError
+        raise ImportPluginError("\n".join(errors))
