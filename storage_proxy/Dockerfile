@@ -1,4 +1,4 @@
-FROM loktar/base:1
+FROM quay.io/loktar/base:master
 
 RUN apt-get install -y nginx \
                        rsyslog && \
