@@ -1,9 +1,12 @@
+from bravado.client import SwaggerClient
 from quay_client import QuayClient
 from quay_client import QuayError
 from uuid import uuid4
 
 from loktar.cmd import exe
+from loktar.environment import AWS
 from loktar.environment import QUAY
+from loktar.environment import STORAGE_PROXY
 from loktar.exceptions import CIBuildPackageFail
 from loktar.plugin import ComplexPlugin
 from loktar.store import store_artifact
@@ -57,6 +60,8 @@ class _Quay(ComplexPlugin):
             }
 
             self.quay = QuayClient()
+            self.storage_proxy = SwaggerClient("{}:{}/v1/swagger.json".format(STORAGE_PROXY["host"],
+                                                                              STORAGE_PROXY["port"]))
 
         def run(self):
             """Default method for running the timeline
@@ -97,8 +102,16 @@ class _Quay(ComplexPlugin):
             """Store the zip archive on a location where quay can fetch it
 
             """
-            store_artifact(self.package_info["build_info"]["storage_type"], self.share_memory["archive_for_build"])
-            self.share_memory["archive_url"] = "not implemented"
+            artifact_ref = store_artifact(self.package_info["build_info"]["storage_type"],
+                                          self.share_memory["archive_for_build"])
+
+            storage_method, artifact_path = artifact_ref.split(":@:")
+
+            self.share_memory["archive_url"] = self.storage_proxy.get_artifact.storage_proxy_get_artifact(
+                storage_backend=storage_method,
+                bucket_name=AWS["BUCKET"],
+                artifact_name=artifact_path
+            ).result()
 
         def trigger_build(self):
             """Trigger the build
