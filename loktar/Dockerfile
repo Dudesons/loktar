@@ -1,4 +1,4 @@
-FROM loktar/base:1
+FROM quay.io/loktar/base:master
 
 COPY src /src
 
