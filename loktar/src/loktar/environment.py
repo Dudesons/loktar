@@ -110,7 +110,7 @@ STORAGE_PROXY = {
 }
 
 CI = {
-  "host": os.getenv("{0}CI_HOST".format(PREFIX_ENV_VAR), None)
+  "external_fqdn": os.getenv("{0}CI_EXTERNAL_FQDN".format(PREFIX_ENV_VAR), None)
 }
 
 

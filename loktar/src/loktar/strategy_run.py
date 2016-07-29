@@ -21,8 +21,8 @@ def strategy_runner(package, run_type, remote=False):
             ImportPluginError: Fail to find / import a plugin
     """
 
-    if run_type not in ["test", "build"]:
-        raise ValueError("run_type must be equal to 'test' or 'build', actual value: {0}".format(run_type))
+    if run_type not in ["test", "artifact"]:
+        raise ValueError("run_type must be equal to 'test' or 'artifact', actual value: {0}".format(run_type))
 
     logger = Log()
     params = {"type": "test_type", "exception": CITestFail}\
@@ -30,9 +30,11 @@ def strategy_runner(package, run_type, remote=False):
     plugins_location = PLUGINS_LOCATIONS.split(",") if type(PLUGINS_LOCATIONS) is str else PLUGINS_LOCATIONS
     try:
         runner = find_plugin(package[params["type"]], run_type, plugins_location)
-
+        logger.info("The plugin {} is loaded".format(package[params["type"]]))
     except ImportPluginError:
         raise
+
+    logger.info("Starting {} plugin ...".format(package[params["type"]]))
 
     try:
         runner.run(package, remote)

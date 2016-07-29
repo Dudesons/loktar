@@ -61,8 +61,8 @@ class _Quay(ComplexPlugin):
             }
 
             self.quay = QuayClient()
-            self.storage_proxy = SwaggerClient("{}:{}/v1/swagger.json".format(STORAGE_PROXY["host"],
-                                                                              STORAGE_PROXY["port"]))
+            self.storage_proxy = SwaggerClient.from_url("{}:{}/v1/swagger.json".format(STORAGE_PROXY["host"],
+                                                                                       STORAGE_PROXY["port"]))
 
         def run(self):
             """Default method for running the timeline
@@ -86,6 +86,9 @@ class _Quay(ComplexPlugin):
             else:
                 self.share_memory["latest_version"] = self.package_info["mode"]
 
+            self.logger.info("The next version for the current package is {} on branch {}"
+                             .format(self.share_memory["latest_version"], self.package_info["mode"]))
+
         def create_archive(self):
             """Create a zip archive for the quay build
 
@@ -103,16 +106,27 @@ class _Quay(ComplexPlugin):
             """Store the zip archive on a location where quay can fetch it
 
             """
-            artifact_ref = store_artifact(self.package_info["build_info"]["storage_type"],
-                                          self.share_memory["archive_for_build"])
+            if self.package_info["build_info"]["build_type"] == "url":
+                self.logger.info("Uploading artifact: {} to {} storage"
+                                 .format(self.share_memory["archive_for_build"],
+                                         self.package_info["build_info"]["storage_type"]))
 
-            storage_method, artifact_path = artifact_ref.split(":@:")
+                artifact_ref = store_artifact(self.package_info["build_info"]["storage_type"],
+                                              self.share_memory["archive_for_build"])
 
-            self.share_memory["archive_url"] = self.storage_proxy.get_artifact.storage_proxy_get_artifact(
-                storage_backend=storage_method,
-                bucket_name=AWS["BUCKET"],
-                artifact_name=artifact_path
-            ).result()
+                self.logger.info("Artifact uploaded, ref: {}".format(artifact_ref))
+
+                storage_method, artifact_path = artifact_ref.split(":@:")
+
+                self.share_memory["archive_url"] = self.storage_proxy.get_artifact.storage_proxy_get_artifact(
+                    storage_backend=storage_method,
+                    bucket_name=AWS["BUCKET"],
+                    artifact_name=artifact_path
+                ).result()
+
+                self.logger.info("Storage proxy requested")
+            else:
+                self.logger.info("Store archive skipped, it' only for url build")
 
         def trigger_build(self):
             """Trigger the build
@@ -120,7 +134,10 @@ class _Quay(ComplexPlugin):
             """
             if self.package_info["build_info"]["build_type"] == "url":
                 extra_tags = [self.share_memory["latest_version"]] if self.package_info["mode"] == "master" else []
-                external_archive_url = "{}/{}".format(CI["host"], self.share_memory["archive_url"])
+                external_archive_url = "{}/{}".format(CI["external_fqdn"], self.share_memory["archive_url"])
+
+                self.logger.info("The artifact for quay is available at: {}".format(external_archive_url))
+                self.logger.info("Start build")
 
                 self.share_memory["build_id"] = self.quay.start_build_url(self.package_info["pkg_name"],
                                                                           self.package_info["mode"],
@@ -128,8 +145,13 @@ class _Quay(ComplexPlugin):
                                                                           extra_tags=extra_tags)
 
             elif self.package_info["build_info"]["build_type"] == "trigger":
+                self.logger.info("Searching trigger ...")
+
                 trigger_id = self.quay.find_trigger(self.package_info["pkg_name"],
                                                     service=self.package_info["build_info"]["trigger_service"])
+
+                self.logger.info("Trigger id: {}".format(trigger_id))
+                self.logger.info("Start build")
 
                 self.share_memory["build_id"] = self.quay.start_build_trigger(self.package_info["pkg_name"],
                                                                               self.package_info["mode"],
@@ -137,6 +159,9 @@ class _Quay(ComplexPlugin):
 
             else:
                 raise CIBuildPackageFail("Unknown build type: {}, only url or trigger is supported")
+
+            self.logger.info("Building ...")
+            self.logger.info("Build id: {}".format(self.share_memory["build_id"]))
 
         def wait_build(self):
             """Wait the end of the build

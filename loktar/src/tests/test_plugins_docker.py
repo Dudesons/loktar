@@ -135,7 +135,7 @@ def test_plugins_docker_fail_on_wait_build(mocker, mode, remote, build_type):
             ]
 
         def wait_build_complete(self, *args, **kwargs):
-            raise QuayError()
+            raise QuayError("Fake error")
 
         def find_trigger(self, *args, **kwargs):
             pass
