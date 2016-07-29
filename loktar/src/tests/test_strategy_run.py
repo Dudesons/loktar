@@ -5,7 +5,7 @@ from loktar.strategy_run import strategy_runner
 
 
 @pytest.mark.parametrize("package", [{"pkg_type": "foo", "test_type": "bar"}])
-@pytest.mark.parametrize("run_type", ["test", "build"])
+@pytest.mark.parametrize("run_type", ["test", "artifact"])
 @pytest.mark.parametrize("remote", [True, False])
 def test_strategy_run(mocker, package, run_type, remote):
     class Fake(object):
@@ -28,7 +28,7 @@ def test_strategy_run_fail_on_value_error_run_type(package):
 
 
 @pytest.mark.parametrize("package", [{"pkg_type": "foo", "test_type": "bar"}])
-@pytest.mark.parametrize("run_type", ["test", "build"])
+@pytest.mark.parametrize("run_type", ["test", "artifact"])
 def test_strategy_run_fail_on_find_plugin(mocker, package, run_type):
     def fake_import(*args, **kwargs):
         raise ImportPluginError("fake import")
@@ -39,7 +39,7 @@ def test_strategy_run_fail_on_find_plugin(mocker, package, run_type):
 
 
 @pytest.mark.parametrize("package", [{"pkg_type": "foo", "test_type": "bar"}])
-@pytest.mark.parametrize("run_type", ["test", "build"])
+@pytest.mark.parametrize("run_type", ["test", "artifact"])
 def test_strategy_run_fail_on_runner(mocker, package, run_type):
     class Fake(object):
         def __init__(self, *args, **kwargs):
