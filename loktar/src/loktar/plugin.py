@@ -126,14 +126,18 @@ def find_plugin(plugin_name, plugin_type, plugin_locations):
     errors = list()
     logger = Log()
 
+    logger.info("Searching plugin: {} in {} standard plugins".format(plugin_name, plugin_type))
     try:
         return importlib.import_module("loktar.plugins.{}.{}".format(plugin_type, plugin_name))
     except ImportError as e:
+        logger.info("{} not found in standard plugin".format(plugin_name))
         errors.append(str(e))
 
+    logger.info("Searching plugin: {} in {} custom plugins".format(plugin_name, plugin_type))
     try:
         return importlib.import_module(plugin_name)
     except ImportError as e:
+        logger.info("{} not found in custom plugin".format(plugin_name))
         errors.append(str(e))
         logger.error("\n".join(errors))
         raise ImportPluginError("\n".join(errors))
