@@ -2,7 +2,6 @@
 
 help:
 	@echo "all - check style with flake8, check code coverage and run the tests, generate the Sphinx documentation, and runs the server."
-	@echo "all-deps - Does the same as all but installs the test and regular dependencies beforehand"
 	@echo "ci - Command used by the CI"
 	@echo "clean - remove all build, test, coverage and Python artifacts"
 	@echo "clean-build - remove build artifacts"
@@ -18,64 +17,64 @@ help:
 
 all: lint coverage docs
 
-all-deps: deps test-deps lint coverage docs
-
 ci: lint test
 
-clean: clean-build clean-pyc clean-test
+clean: clean-build clean-pyc clean-docker clean-test
+
+clean-docker:
+	docker-compose kill
+	docker-compose rm --all -fv
 
 clean-build:
-	rm -fr build/
-	rm -fr dist/
-	rm -fr .eggs/
-	find . -name '*.egg-info' -exec rm -fr {} +
-	find . -name '*.egg' -exec rm -f {} +
+	rm -rf ./src/build/
+	rm -rf ./src/dist/
+	rm -rf ./src/*egg*/
 
 clean-pyc:
 	find . -name '*.pyc' -exec rm -f {} +
 	find . -name '*.pyo' -exec rm -f {} +
-	find . -name '*~' -exec rm -f {} +
-	find . -name '__pycache__' -exec rm -fr {} +
+	find . -name '*.~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -rf {} +
 
 clean-test:
-	rm -fr .tox/
-	rm -f .coverage
-	rm -fr htmlcov/
-	rm -rf .cache
-	rm -rf coverage.xml
-
-deps:
-	pip install -r requirements.txt --upgrade
-
-test-deps:
-	pip install -r test_requirements.txt --upgrade
-	pip install flake8 hacking --upgrade
-	pip install pytest-cov --upgrade
-	pip install sphinx --upgrade
+	rm -f ./src/.coverage
+	rm -fr ./src/htmlcov/
+	rm -rf ./src/.cache
+	rm -rf ./src/coverage.xml
 
 lint:
-	flake8 loktar tests
+	docker-compose run --no-deps loktar flake8 loktar
 
 test:
-	PYTHONPATH=$(shell pwd) py.test -s tests/
+	docker-compose run loktar py.test -s tests/
+
 
 coverage:
-	PYTHONPATH=$(shell pwd) py.test -s --cov=loktar --cov-report html --cov-report xml --cov-config .coveragerc tests/
+	docker-compose run loktar py.test -s --cov=loktar --cov-report html --cov-report xml --cov-config .coveragerc tests/
 
 docs:
-	rm -f docs/loktar.rst
-	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ loktar -e
-	$(MAKE) -C docs clean
-	$(MAKE) -C docs html
+	# rm -f docs/loktar.rst
+	# rm -f docs/modules.rst
+	# sphinx-apidoc -o docs/ loktar -e
+	# $(MAKE) -C docs clean
+	# $(MAKE) -C docs html
+	@echo 'to do gen doc'
 
-release: clean
-	python setup.py sdist bdist_wheel upload -r pypi
+register: clean build
+	docker-compose -f docker-compose.yml -f docker-compose-release.yml run --no-deps loktar python setup.py register -r pypi
+
+release: clean build
+	docker-compose -f docker-compose.yml -f docker-compose-release.yml run --no-deps loktar python setup.py bdist_wheel upload -r pypi
 
 dist: clean
 	python setup.py sdist
 	python setup.py bdist_wheel
-	ls -l dist
 
 install: clean
 	python setup.py install
+
+shell:
+	docker-compose run loktar bash
+
+build:
+	docker-compose build

@@ -1,0 +1,13 @@
+version: "2"
+
+services:
+
+  storage_proxy:
+    volumes:
+      - ./app:/app
+    ports:
+      - "8081:8081"
+    env_file:
+      - storage_proxy.env
+      - secret.env
+
