@@ -2,7 +2,7 @@ class LoktarException(Exception):
     def __init__(self, message, *args):
         Exception.__init__(self, message, *args)
         self.reason = message
-        
+
     def __str__(self):
         return "{}: {}".format(type(self).__name__, self.reason)
 

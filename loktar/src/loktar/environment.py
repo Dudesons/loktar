@@ -110,7 +110,7 @@ STORAGE_PROXY = {
 }
 
 CI = {
-  "external_fqdn": os.getenv("{0}CI_EXTERNAL_FQDN".format(PREFIX_ENV_VAR), None)
+    "external_fqdn": os.getenv("{0}CI_EXTERNAL_FQDN".format(PREFIX_ENV_VAR), None)
 }
 
 
@@ -200,9 +200,9 @@ def get_config(package_name, test_env_path, full=False):
     logger.info('Parsing configuration')
     if not full:
         for package in config['packages']:
-                if package['pkg_name'] == package_name:
-                    pkg_config = package
-                    break
+            if package['pkg_name'] == package_name:
+                pkg_config = package
+                break
     else:
         pkg_config = config
 

@@ -15,7 +15,12 @@ def run(*args, **kwargs):
 
 class EMR(object):
     def __init__(self, package_info, remote):
-        """
+        """Plugin for managing artifacts for aws emr
+
+            Args:
+                package_info (dict): Contains information about the package to execute inside the plugin
+                remote (bool): Define if the plugin will be execute in remote or not
+
         """
         if package_info["build_info"]["input_type"] == "jar":
             _Jar(package_info, remote).run()
@@ -26,21 +31,22 @@ class EMR(object):
 
 class _Jar(SimplePlugin):
     def __init__(self, package_info, remote):
-        """Plugin for launching the jar build for a EMR, the is stored on s3
+        """Build the jar for a EMR, it is stored on s3
 
             Args:
                 package_info (dict): Contains information about the package to execute inside the plugin
                 remote (bool): Define if the plugin will be execute in remote or not
-
         """
 
         if package_info["mode"] == "master":
-            s3cmd = "aws s3 cp ./target/*jar s3://{}/jars/prod/{}/".format(
+            s3cmd = "{} aws s3 cp ./target/*jar s3://{}/jars/prod/{}/".format(
+                package_info["build_info"].get("prefix_command", ""),
                 package_info["build_info"]["bucket_name"],
                 package_info["pkg_name"]
             )
         else:
-            s3cmd = "aws s3 cp ./target/*jar s3://{}/jars/dev/{}/{}/".format(
+            s3cmd = "{} aws s3 cp ./target/*jar s3://{}/jars/dev/{}/{}/".format(
+                package_info["build_info"].get("prefix_command", ""),
                 package_info["build_info"]["bucket_name"],
                 package_info["pkg_name"],
                 package_info["mode"]
@@ -49,9 +55,7 @@ class _Jar(SimplePlugin):
         SimplePlugin.__init__(self, package_info,
                               {
                                   "command": {
-                                      "run": (
-                                        package_info["build_info"].get("prefix_command", "") + " " + s3cmd
-                                      ).strip(),
+                                      "run": s3cmd.strip(),
                                       "clean": "make clean"
                                   }
                               },
