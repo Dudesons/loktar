@@ -12,7 +12,7 @@ def run(*args, **kwargs):
 
     """
     try:
-        Whl(args[0], args[1]).run()
+        return Whl(args[0], args[1]).run()
     except IndexError:
         print(Whl.__init__.__doc__)
         raise
@@ -48,6 +48,9 @@ class Whl(ComplexPlugin):
 
             """
             self._run()
+            return {
+                "version": self.share_memory["latest_version"]
+            }
 
         def get_next_version(self):
             """Get the next version for the current package

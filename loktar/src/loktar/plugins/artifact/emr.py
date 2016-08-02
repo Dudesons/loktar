@@ -7,7 +7,8 @@ def run(*args, **kwargs):
 
     """
     try:
-        EMR(*args)
+        plugin = EMR(*args)
+        return plugin.get_result()
     except TypeError:
         print(EMR.__init__.__doc__)
         raise
@@ -23,10 +24,13 @@ class EMR(object):
 
         """
         if package_info["build_info"]["input_type"] == "jar":
-            _Jar(package_info, remote).run()
+            self.__result = _Jar(package_info, remote).run()
         else:
             raise CIBuildPackageFail("the input type : '{}' is not managed, create a pr for integrate this input type"
                                      .format(package_info["build_info"]["input_type"]))
+
+    def get_result(self):
+        return self.__result
 
 
 class _Jar(SimplePlugin):
@@ -63,3 +67,5 @@ class _Jar(SimplePlugin):
 
     def run(self):
         self._base_run()
+        return {
+        }
