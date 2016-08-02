@@ -1,6 +1,8 @@
+from github import GithubException
 from mock import MagicMock
 import pytest
 
+from loktar.exceptions import SCMError
 from loktar.scm import fetch_github_file
 from loktar.scm import Github
 
@@ -60,6 +62,8 @@ class PullRequest(object):
 
 
 class Repository(object):
+        def __init__(self, fail):
+            self.fail = fail
 
         def get_pulls(self, state=None):
             return [
@@ -76,12 +80,27 @@ class Repository(object):
         def commit(self, sha):
             return Commit()
 
+        def create_git_tag_and_release(self, tag_name, tag_message, release_name, patch_note, commit_id, type_object="commit"):
+            if self.fail["status"] == 201 and self.fail["exc"] is False:
+                return {
+                    "status": "201 Created"
+                }
+            else:
+                if self.fail["status"] == 400:
+                    return {
+                        "status": "400 blabla"
+                    }
+                else:
+                    raise GithubException("", "")
+
 
 class fakePR(object):
+        def __init__(self, fail):
+            self.fail = fail
 
         def get_organization(self, *args, **kwargs):
             mock_get_repo = MagicMock()
-            mock_get_repo.get_repo.return_value = Repository()
+            mock_get_repo.get_repo.return_value = Repository(self.fail)
             return mock_get_repo
 
 
@@ -92,13 +111,18 @@ def mock_github_obj(mocker):
     return github_mock
 
 
-def test_github(mock_github_obj):
+@pytest.mark.parametrize("fail", [
+    {"status": 201, "exc": False},
+    {"status": 400, "exc": False},
+    {"status": 201, "exc": True}
+])
+def test_github(mock_github_obj, fail):
 
-    def fake(*args, **kwargs):
-        return fakePR()
+    def fake(fail, *args, **kwargs):
+        return fakePR(fail)
 
     mock_github = mock_github_obj
-    mock_github.return_value = fake()
+    mock_github.return_value = fake(fail)
 
     scm = Github("toto", "titi")
 
@@ -118,6 +142,17 @@ def test_github(mock_github_obj):
     last_commit, statuses = scm.get_last_statuses_from_pull_request(42)
     assert statuses == ['status1', 'status2']
     scm.get_last_commits_from_pull_request(42)
+    if fail["status"] != 201 or fail["exc"] is True:
+        with pytest.raises(SCMError) as excinfo:
+            scm.set_tag_and_release("tag_name", "tag_message", "release_name", "patch_note", "commit_id")
+
+            if fail["status"] != 201:
+                assert str(excinfo) == "SCMError: The tag or the release can't be created"
+    else:
+        response = scm.set_tag_and_release("tag_name", "tag_message", "release_name", "patch_note", "commit_id")
+
+        assert response.has_key("status")
+        assert response["status"] == "201 Created"
 
 
 def test_fetch_github_file(mocker):
