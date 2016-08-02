@@ -69,3 +69,7 @@ class UnknownStorageMethod(LoktarException):
 
 class NotificationError(LoktarException):
     """Exception raised by if the storage method doesn't exist"""
+
+
+class SCMError(LoktarException):
+    """Exception raised when an error is encountered with scm system"""

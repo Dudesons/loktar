@@ -18,7 +18,8 @@ def run(*args, **kwargs):
 
     """
     try:
-        Docker(*args)
+        plugin = Docker(*args)
+        return plugin.get_result()
     except TypeError:
         print(Docker.__init__.__doc__)
         raise
@@ -27,10 +28,13 @@ def run(*args, **kwargs):
 class Docker(object):
         def __init__(self, package_info, remote):
             if package_info["build_info"]["registry_type"] == "quay":
-                _Quay(package_info, remote).run()
+                self.__result = _Quay(package_info, remote).run()
             else:
                 raise CIBuildPackageFail("the registry : '{}' is not managed, create a pr for integrate this registry"
                                          .format(package_info["build_info"]["registry_type"]))
+
+        def get_result(self):
+            return self.__result
 
 
 class _Quay(ComplexPlugin):
@@ -69,6 +73,9 @@ class _Quay(ComplexPlugin):
 
             """
             self._run()
+            return {
+                "version": self.share_memory["latest_version"]
+            }
 
         def get_next_version(self):
             """Get the next version for the current artifact
