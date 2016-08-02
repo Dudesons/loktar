@@ -1,12 +1,14 @@
 from github import Github as GitHub
+from github import GithubException
 import requests
 import StringIO
 
 from loktar.decorators import retry
 from loktar.environment import GITHUB_INFO
+from loktar.exceptions import SCMError
 from loktar.log import Log
 
-logger = Log()
+# logger = Log()
 
 
 class Github(object):
@@ -188,6 +190,43 @@ class Github(object):
                 if issue_comment.body == comment:
                     return
         return pr.create_issue_comment(comment)
+
+    @retry
+    def set_tag_and_release(self, tag_name, tag_message, release_name, patch_note, commit_id, type_object="commit"):
+        """Create a tag on specific git object (commit, tree or blob) and create a release from this tag
+
+        Args:
+            tag_name (str): The name for the tag
+            tag_message (str): The message link to the tag
+            release_name (str): The release name
+            patch_note (str): The patch note associated to the release
+            commit_id (str): The commit to attach the tag
+            type_object (str): the target git object for tagging
+
+        Returns:
+            github.GitRelease.GitRelease: The release that was created
+
+        Raises:
+            SCMError
+        """
+        try:
+            response = self._repository.create_git_tag_and_release(tag_name,
+                                                                   tag_message,
+                                                                   release_name,
+                                                                   patch_note,
+                                                                   type_object)
+        except GithubException as e:
+            self.logger.error(str(e))
+            raise SCMError(str(e))
+
+        if response["status"] == "201 Created":
+            self.logger.info("The tag: {0} was created on the commit id {1} and the release is attached to the tag: {0}"
+                             .format(tag_name, commit_id))
+            return response
+
+        else:
+            self.logger.error("response: status : {}".format(response["status"]))
+            raise SCMError("The tag or the release can't be created")
 
 
 @retry
