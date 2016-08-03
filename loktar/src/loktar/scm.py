@@ -16,6 +16,8 @@ class Github(object):
     Args:
         login (str): login for GitHub
         password (str): password for GitHub
+
+    Keyword Args:
         github_organization (str): this is the github organization for get back the repository, default value None.
                                    Also can be set by environment variable LOKTAR_GITHUB_INFO_ORGANIZATION
         github_repository (str): this is the target repository to download, default value None
@@ -23,10 +25,10 @@ class Github(object):
 
     """
 
-    def __init__(self, login, password, github_organization=None, github_repository=None):
+    def __init__(self, login, password, **kwargs):
         self._connexion = GitHub(login, password)
-        self.organization_name = GITHUB_INFO["repository"] if github_organization is None else github_organization
-        self.repository_name = GITHUB_INFO["repository"] if github_repository is None else github_repository
+        self.organization_name = kwargs.get("github_organization", GITHUB_INFO['organization'])
+        self.repository_name = kwargs.get("github_repository", GITHUB_INFO['repository'])
         self._repository = self._connexion.get_organization(self.organization_name).get_repo(self.repository_name)
         # Used for cache
         self.pull_requests_cache = {}
