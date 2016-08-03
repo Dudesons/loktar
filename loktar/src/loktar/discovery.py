@@ -11,8 +11,8 @@ logger = Log()
 def _find_modified_files_from_github(git_branch, **kwargs):
     github = Github(kwargs.get("github_user", GITHUB_INFO['login']['user']),
                     kwargs.get("github_password", GITHUB_INFO['login']['password']),
-                    kwargs.get("github_orgnisation", GITHUB_INFO['organization']),
-                    kwargs.get("github_repository", GITHUB_INFO['repository']))
+                    github_organization=kwargs.get("github_organization", GITHUB_INFO['organization']),
+                    github_repository=kwargs.get("github_repository", GITHUB_INFO['repository']))
 
     try:
         if git_branch == "master":
