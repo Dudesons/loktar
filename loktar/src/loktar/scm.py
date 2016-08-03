@@ -1,5 +1,6 @@
 from github import Github as GitHub
 from github import GithubException
+from github import UnknownObjectException
 import requests
 import StringIO
 
@@ -7,8 +8,6 @@ from loktar.decorators import retry
 from loktar.environment import GITHUB_INFO
 from loktar.exceptions import SCMError
 from loktar.log import Log
-
-# logger = Log()
 
 
 class Github(object):
@@ -94,7 +93,12 @@ class Github(object):
         if use_cache and pull_request_id in self.pull_requests_cache:
             pull_request = self.pull_requests_cache[pull_request_id]
         else:
-            pull_request = self._repository.get_pull(pull_request_id)
+            try:
+                pull_request = self._repository.get_pull(pull_request_id)
+            except AssertionError:
+                self.logger.error("pull request id must be an int or a long not: {}".format(type(pull_request_id)))
+                raise SCMError("pull request id must be an int or a long")
+
             self._cache_pull_requests([pull_request])
         return pull_request
 
@@ -228,8 +232,40 @@ class Github(object):
             self.logger.error("response: status : {}".format(response["status"]))
             raise SCMError("The tag or the release can't be created")
 
+    @retry
+    def get_modified_files_from_pull_request(self, pull_request_id):
+        """Create a tag on specific git object (commit, tree or blob) and create a release from this tag
 
-@retry
+        Args:
+            pull_request_id (int): the id of the pull request
+
+        Returns:
+            list of files modified
+
+        Raises:
+            SCMError
+        """
+        try:
+            pr_info = self.get_pull_request(pull_request_id)
+
+        except GithubException as e:
+            self.logger.error(str(e))
+            raise SCMError(str(e))
+
+        return [f.filename for f in pr_info.get_files()]
+
+    @retry
+    def get_commit(self, commit_id):
+        try:
+            return self._repository.get_commit(commit_id)
+        except (UnknownObjectException, AssertionError) as e:
+            raise SCMError(str(e))
+
+    @retry
+    def get_modified_files_from_commit(self, commit_id):
+        return [f.filename for f in self.get_commit(commit_id).files]
+
+
 def fetch_github_file(url, token):
     """Fetch a file from GitHub
 
