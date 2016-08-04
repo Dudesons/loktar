@@ -87,9 +87,9 @@ class _Quay(ComplexPlugin):
                             if tags.isdigit()]
                 versions.sort(reverse=True)
                 try:
-                    self.share_memory["latest_version"] = versions[0] + 1
+                    self.share_memory["latest_version"] = str(int(versions[0]) + 1)
                 except IndexError:
-                    self.share_memory["latest_version"] = 1
+                    self.share_memory["latest_version"] = "1"
             else:
                 self.share_memory["latest_version"] = self.package_info["mode"]
 
