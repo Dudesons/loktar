@@ -220,6 +220,7 @@ class Github(object):
                                                                    tag_message,
                                                                    release_name,
                                                                    patch_note,
+                                                                   commit_id,
                                                                    type_object)
         except GithubException as e:
             self.logger.error(str(e))
