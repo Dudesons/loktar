@@ -43,13 +43,13 @@ class _Jar(SimplePlugin):
         """
 
         if package_info["mode"] == "master":
-            s3cmd = "{} aws s3 cp ./target/*jar s3://{}/jars/prod/{}/".format(
+            s3cmd = "{} aws s3 cp ./target/ s3://{}/jars/prod/{}/ --recursive --exclude '*' --include '*.jar'".format(
                 package_info["build_info"].get("prefix_command", ""),
                 package_info["build_info"]["bucket_name"],
                 package_info["pkg_name"]
             )
         else:
-            s3cmd = "{} aws s3 cp ./target/*jar s3://{}/jars/dev/{}/{}/".format(
+            s3cmd = "{} aws s3 cp ./target/ s3://{}/jars/dev/{}/{}/ --recursive --exclude '*' --include '*.jar'".format(
                 package_info["build_info"].get("prefix_command", ""),
                 package_info["build_info"]["bucket_name"],
                 package_info["pkg_name"],

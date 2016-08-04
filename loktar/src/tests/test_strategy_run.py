@@ -4,7 +4,10 @@ from loktar.exceptions import ImportPluginError
 from loktar.strategy_run import strategy_runner
 
 
-@pytest.mark.parametrize("package", [{"pkg_type": "foo", "test_type": "bar"}])
+@pytest.mark.parametrize("package", [
+    {"pkg_type": "foo", "test_type": "bar"},
+    {"pkg_type": "foo2", "test_type": "no-test"}
+])
 @pytest.mark.parametrize("run_type", ["test", "artifact"])
 @pytest.mark.parametrize("remote", [True, False])
 def test_strategy_run(mocker, package, run_type, remote):
