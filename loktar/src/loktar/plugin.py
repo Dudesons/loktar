@@ -59,7 +59,7 @@ class SimplePlugin(object):
             with self.cwd(self.path):
                 with settings(warn_only=True):
                     if not exe(cmd, remote=self.remote):
-                        raise CITestFail("Test failed")
+                        raise CITestFail("Test failed, on command: {}, remote: {}".format(cmd, self.remote))
 
     def _base_run(self):
         try:
