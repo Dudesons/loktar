@@ -59,8 +59,8 @@ def test_github(mock_github_obj, fail):
     else:
         response = scm.set_tag_and_release("tag_name", "tag_message", "release_name", "patch_note", "commit_id")
 
-        assert response.has_key("status")
-        assert response["status"] == "201 Created"
+        assert response.raw_headers.has_key("status")
+        assert response.raw_headers["status"] == "201 Created"
 
 
 def test_fetch_github_file(mocker):

@@ -60,6 +60,21 @@ class PullRequest(object):
             return [File("toto"), File("toto"), File("lulu")]
 
 
+class Release(object):
+    def __init__(self, fail):
+        if fail["status"] == 201 and fail["exc"] is False:
+            self.raw_headers = {
+                "status": "201 Created"
+            }
+        else:
+            if fail["status"] == 400:
+                self.raw_headers = {
+                    "status": "400 blabla"
+                }
+            else:
+                raise GithubException("", "")
+
+
 class Repository(object):
         def __init__(self, fail):
             self.fail = fail
@@ -86,17 +101,7 @@ class Repository(object):
             return Commit()
 
         def create_git_tag_and_release(self, tag_name, tag_message, release_name, patch_note, commit_id, type_object="commit"):
-            if self.fail["status"] == 201 and self.fail["exc"] is False:
-                return {
-                    "status": "201 Created"
-                }
-            else:
-                if self.fail["status"] == 400:
-                    return {
-                        "status": "400 blabla"
-                    }
-                else:
-                    raise GithubException("", "")
+            return Release(self.fail)
 
 
 class FakeGithubRepo(object):

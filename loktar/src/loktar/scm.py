@@ -226,13 +226,13 @@ class Github(object):
             self.logger.error(str(e))
             raise SCMError(str(e))
 
-        if response["status"] == "201 Created":
+        if response.raw_headers["status"] == "201 Created":
             self.logger.info("The tag: {0} was created on the commit id {1} and the release is attached to the tag: {0}"
                              .format(tag_name, commit_id))
             return response
 
         else:
-            self.logger.error("response: status : {}".format(response["status"]))
+            self.logger.error("response: status : {}".format(response.raw_headers["status"]))
             raise SCMError("The tag or the release can't be created")
 
     @retry
