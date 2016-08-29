@@ -86,7 +86,10 @@ AWS = {
     "BUCKET": os.getenv("{0}AWS_BUCKET".format(PREFIX_ENV_VAR), None)
 }
 
-PLUGINS_LOCATIONS = os.getenv("{0}PLUGINS_LOCATIONS".format(PREFIX_ENV_VAR), [])
+PLUGINS_INFO = {
+    "locations": os.getenv("{0}PLUGINS_LOCATIONS".format(PREFIX_ENV_VAR), []),
+    "workspace": os.getenv("{0}PLUGINS_WORSPACE".format(PREFIX_ENV_VAR), None),
+}
 
 SLACK = {
     "token": os.getenv("{0}SLACK_TOKEN".format(PREFIX_ENV_VAR), None),
