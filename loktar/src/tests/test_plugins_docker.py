@@ -80,7 +80,20 @@ def test_plugins_docker_fail_on_create_archive(mocker, mode, remote, build_type)
     mocker.patch("loktar.plugins.artifact.docker.store_artifact", return_value="store:@:the_artifact.zip")
     mocker.patch("loktar.plugins.artifact.docker.SwaggerClient")
 
-    with pytest.raises(CIBuildPackageFail):
+    if build_type == "url":
+        with pytest.raises(CIBuildPackageFail):
+            run({
+                "pkg_name": "foobar",
+                "mode": mode,
+                "package_location": "/tmp",
+                "build_info": {
+                    "registry_type": "quay",
+                    "build_type": build_type,
+                    "storge_type": "s3",
+                    "trigger_service": "github"
+                }
+            }, remote)
+    else:
         run({
             "pkg_name": "foobar",
             "mode": mode,

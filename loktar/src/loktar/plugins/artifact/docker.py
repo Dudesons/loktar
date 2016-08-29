@@ -100,14 +100,18 @@ class _Quay(ComplexPlugin):
             """Create a zip archive for the quay build
 
             """
-            archive_name = str(uuid4()) + ".zip"
-            zip_command = "zip -r {} *".format(archive_name)
-            with self.cwd(self.path):
-                if not exe(zip_command, remote=self.remote):
-                    raise CIBuildPackageFail("the command : {} executed in the directory {} return False"
-                                             .format(zip_command, self.path))
+            if self.package_info["build_info"]["build_type"] == "url":
+                archive_name = str(uuid4()) + ".zip"
+                zip_command = "zip -r {} *".format(archive_name)
+                with self.cwd(self.path):
+                    if not exe(zip_command, remote=self.remote):
+                        raise CIBuildPackageFail("the command : {} executed in the directory {} return False"
+                                                 .format(zip_command, self.path))
 
-            self.share_memory["archive_for_build"] = self.path + "/" + archive_name
+                self.share_memory["archive_for_build"] = self.path + "/" + archive_name
+                self.logger.info("Zip archive built")
+            else:
+                self.logger.info("Zip archive skipped, it' only for url build")
 
         def store_archive(self):
             """Store the zip archive on a location where quay can fetch it
