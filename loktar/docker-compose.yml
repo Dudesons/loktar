@@ -1,0 +1,14 @@
+version: "2"
+
+services:
+  redis:
+    image: redis
+
+  loktar:
+    build: .
+    volumes:
+      - ./src/:/src/
+    links:
+      - redis
+    environment:
+      - "PYTHONPATH=$PYTHONPATH:/src"
