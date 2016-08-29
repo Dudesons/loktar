@@ -108,13 +108,14 @@ class ComplexPlugin(SimplePlugin):
             self.timeline[ref]()
 
 
-def find_plugin(plugin_name, plugin_type, plugin_locations):
+def find_plugin(plugin_name, plugin_type, plugin_locations, workspace):
     """Try to retrieve a plugin
 
         Args:
             plugin_name (str): the plugin to search
             plugin_type (str): the type of plugin to fetch
             plugin_locations (list): locations of plugins
+            workspace (str):  Plugins workspace for fetching plugins
 
         Raises:
             ImportPluginError: it raise if the plugin cannot import or the plugin is not found
@@ -135,8 +136,8 @@ def find_plugin(plugin_name, plugin_type, plugin_locations):
 
     logger.info("Searching plugin: {} in {} custom plugins".format(plugin_name, plugin_type))
     try:
-        return importlib.import_module(plugin_name)
-    except ImportError as e:
+        return importlib.import_module("{}.{}.{}".format(workspace, plugin_type, plugin_name))
+    except (ImportError, TypeError) as e:
         logger.info("{} not found in custom plugin".format(plugin_name))
         errors.append(str(e))
         logger.error("\n".join(errors))

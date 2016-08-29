@@ -1,4 +1,4 @@
-from loktar.environment import PLUGINS_LOCATIONS
+from loktar.environment import PLUGINS_INFO
 from loktar.exceptions import CIBuildPackageFail
 from loktar.exceptions import CITestFail
 from loktar.exceptions import ImportPluginError
@@ -34,9 +34,12 @@ def strategy_runner(package, run_type, remote=False):
     else:
         params = {"type": "test_type", "exception": CITestFail}\
             if run_type == "test" else {"type": "pkg_type", "exception": CIBuildPackageFail}
-        plugins_location = PLUGINS_LOCATIONS.split(",") if type(PLUGINS_LOCATIONS) is str else PLUGINS_LOCATIONS
+
+        plugins_location = PLUGINS_INFO["locations"].split(",") \
+            if type(PLUGINS_INFO["locations"]) is str else PLUGINS_INFO["locations"]
+
         try:
-            runner = find_plugin(package[params["type"]], run_type, plugins_location)
+            runner = find_plugin(package[params["type"]], run_type, plugins_location, PLUGINS_INFO["workspace"])
             logger.info("The plugin {} is loaded".format(package[params["type"]]))
         except ImportPluginError:
             raise
