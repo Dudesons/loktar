@@ -55,4 +55,4 @@ def test_strategy_run_fail_on_runner(mocker, package, run_type):
     mocker.patch("loktar.strategy_run.find_plugin", return_value=Fake)
 
     with pytest.raises(Exception):
-        strategy_runner(package, run_type)
+        strategy_runner(package, run_type, "my_custom_plugins_dir")
