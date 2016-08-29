@@ -80,10 +80,11 @@ def wait_elasticsearch(host="localhost", port=9200, retries=30, sleep=10, secure
             continue
 
         logger.info("ES is up, checking status.")
-        print res
         health = res.json()["status"]
         if health in ["green", "yellow"]:
             return True
+        else:
+            logger.info("health status: {}".format(health))
 
     logger.error("Cannot connect to elasticsearch.")
     logger.error("Aborting")
