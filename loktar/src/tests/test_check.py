@@ -9,7 +9,9 @@ from loktar.check import wait_dynamodb
 from loktar.check import wait_elasticsearch
 from loktar.check import wait_etcd
 from loktar.check import wait_mongo
+from loktar.check import wait_rds
 from loktar.check import wait_redis
+from loktar.check import wait_s3
 from loktar.check import wait_sqs
 from loktar.check import wait_ssh
 
@@ -201,3 +203,43 @@ def test_wait_ssh(mocker, fail, client_params):
             assert is_ready is False
         else:
             assert is_ready is True
+
+
+@pytest.mark.parametrize("fail", [True, False])
+def test_wait_s3(mocker, fail):
+    class FakeS3(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def get_all_buckets(self):
+            if fail:
+                raise socket.gaierror
+            else:
+                return list()
+
+    mocker.patch("loktar.check.s3_connect_to_region", return_value=FakeS3())
+
+    if fail:
+        assert wait_s3() is False
+    else:
+        assert wait_s3() is True
+
+
+@pytest.mark.parametrize("fail", [True, False])
+def test_wait_rds(mocker, fail):
+    class FakeRDS(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def get_all_dbinstances(self):
+            if fail:
+                raise socket.gaierror
+            else:
+                return list()
+
+    mocker.patch("loktar.check.rds_connect_to_region", return_value=FakeRDS())
+
+    if fail:
+        assert wait_rds() is False
+    else:
+        assert wait_rds() is True
