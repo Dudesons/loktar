@@ -88,7 +88,7 @@ AWS = {
 
 PLUGINS_INFO = {
     "locations": os.getenv("{0}PLUGINS_LOCATIONS".format(PREFIX_ENV_VAR), []),
-    "workspace": os.getenv("{0}PLUGINS_WORSPACE".format(PREFIX_ENV_VAR), None),
+    "workspace": os.getenv("{0}PLUGINS_WORKSPACE".format(PREFIX_ENV_VAR), None),
 }
 
 SLACK = {
