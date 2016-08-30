@@ -1,6 +1,8 @@
 import time
 
 from boto.dynamodb2 import connect_to_region as ddb_connect_to_region
+from boto.rds import connect_to_region as rds_connect_to_region
+from boto.s3 import connect_to_region as s3_connect_to_region
 from boto.sqs import connect_to_region as sqs_connect_to_region
 from boto.sqs.regioninfo import SQSRegionInfo
 from etcd import Client as EtcdClient
@@ -266,4 +268,60 @@ def wait_sqs(host="localhost", port=9324, **kwargs):
         return False
 
     logger.info("sqs is ready")
+    return True
+
+
+def wait_rds(host="localhost", port=9324, **kwargs):
+    client = rds_connect_to_region("eu-west-1",
+                                   host=host,
+                                   port=port,
+                                   is_secure=kwargs.get("secure", False),
+                                   aws_access_key_id=kwargs.get("aws_access_key_id", "foo"),
+                                   aws_secret_access_key=kwargs.get("aws_secret_access_key", "bar"))
+
+
+    try:
+        logger.info("Waiting RDS (5min max internal boto retry)")
+        client.get_all_dbinstances()
+    except socket.gaierror:
+        logger.error("Cannot connect to RDS.")
+        logger.error("Aborting")
+        return False
+
+    logger.info("RDS is ready")
+    return True
+
+
+def wait_s3(host="localhost", port=9324, **kwargs):
+    """"Wait for s3 to be up.
+
+        Args:
+            host (Optional[str]): Host name. Default to "localhost".
+            port (Optional[int]): S3 port. Defaults to 8000.
+
+        Keyword Args:
+            secure (bool): The communication is secure, default value False
+            aws_access_key_id (str): Access key for aws (boto), default value foo
+            aws_secret_access_key (str): Secret key for aws (boto), default value bar
+
+        Returns:
+           bool: True if it is ready, False if something went wrong
+
+        """
+    client = s3_connect_to_region("eu-west-1",
+                                  host=host,
+                                  port=port,
+                                  is_secure=kwargs.get("secure", False),
+                                  aws_access_key_id=kwargs.get("aws_access_key_id", "foo"),
+                                  aws_secret_access_key=kwargs.get("aws_secret_access_key", "bar"))
+
+    try:
+        logger.info("Waiting s3 (5min max internal boto retry)")
+        client.get_all_buckets()
+    except socket.gaierror:
+        logger.error("Cannot connect to S3.")
+        logger.error("Aborting")
+        return False
+
+    logger.info("S3 is ready")
     return True
