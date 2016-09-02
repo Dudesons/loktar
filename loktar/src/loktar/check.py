@@ -252,8 +252,7 @@ def wait_sqs(host="localhost", port=9324, **kwargs):
                                      aws_access_key_id=kwargs.get("aws_access_key_id", "foo"),
                                      aws_secret_access_key=kwargs.get("aws_secret_access_key", "bar"))
     else:
-        client = sqs_connect_to_region(kwargs.get("region"),
-                                       host=host,
+        client = sqs_connect_to_region(kwargs.get("region", "eu-west-1"),
                                        port=port,
                                        is_secure=kwargs.get("secure", False),
                                        aws_access_key_id=kwargs.get("aws_access_key_id", "foo"),
