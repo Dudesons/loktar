@@ -15,7 +15,7 @@ with open('README.md') as readme_file:
 requirements = [str(i.req) for i in parse_requirements("requirements.txt", session=False)]
 test_requirements = [str(i.req) for i in parse_requirements("test_requirements.txt", session=False)]
 
-VERSION = '28'
+VERSION = '30'
 
 setup(
     name='loktar',
