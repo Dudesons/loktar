@@ -29,6 +29,6 @@ def get_jobs():
     return DB.get_jobs(), 201
 
 
-def get_job(id):
-    return DB.get_job(id), 201
+def get_job(job_id):
+    return DB.get_job(job_id), 201
 
