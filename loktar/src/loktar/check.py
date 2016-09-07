@@ -59,7 +59,7 @@ def wait_ssh(host="localhost", port=22, retries=30, sleep=10, **kwargs):
     return False
 
 
-def wait_elasticsearch(host="localhost", port=9200, retries=30, sleep=10, secure=False):
+def wait_elasticsearch(host="localhost", port=9200, retries=30, sleep=10, secure=False, **kwargs):
     """Wait for Elasticsearch to be up.
 
     Args:
@@ -93,7 +93,7 @@ def wait_elasticsearch(host="localhost", port=9200, retries=30, sleep=10, secure
     return False
 
 
-def wait_mongo(host="localhost", port=27017, retries=30, sleep=10):
+def wait_mongo(host="localhost", port=27017, retries=30, sleep=10, **kwargs):
     """Wait for Mongo DB to be up.
 
     Args:
@@ -124,7 +124,7 @@ def wait_mongo(host="localhost", port=27017, retries=30, sleep=10):
     return False
 
 
-def wait_redis(host="localhost", port=6379, retries=30, sleep=10):
+def wait_redis(host="localhost", port=6379, retries=30, sleep=10, **kwargs):
     """Wait for Redis to be up.
 
     Args:
@@ -152,7 +152,7 @@ def wait_redis(host="localhost", port=6379, retries=30, sleep=10):
     return False
 
 
-def wait_etcd(host="localhost", port=4001, retries=30, sleep=10):
+def wait_etcd(host="localhost", port=4001, retries=30, sleep=10, **kwargs):
     """Wait for etcd to be up.
 
     Args:
@@ -270,14 +270,12 @@ def wait_sqs(host="localhost", port=9324, **kwargs):
     return True
 
 
-def wait_rds(host="localhost", port=9324, **kwargs):
+def wait_rds(port=9324, **kwargs):
     client = rds_connect_to_region("eu-west-1",
-                                   host=host,
                                    port=port,
                                    is_secure=kwargs.get("secure", False),
                                    aws_access_key_id=kwargs.get("aws_access_key_id", "foo"),
                                    aws_secret_access_key=kwargs.get("aws_secret_access_key", "bar"))
-
 
     try:
         logger.info("Waiting RDS (5min max internal boto retry)")
