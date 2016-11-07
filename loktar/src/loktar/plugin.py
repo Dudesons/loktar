@@ -5,7 +5,7 @@ import importlib
 import sys
 
 from loktar.cmd import exe
-from loktar.environment import ROOT_PATH
+from loktar.constants import ROOT_PATH
 from loktar.exceptions import CITestFail
 from loktar.exceptions import ForbiddenTimelineKey
 from loktar.exceptions import ImportPluginError

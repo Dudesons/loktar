@@ -1,5 +1,6 @@
 import time
 
+from boto.exception import S3ResponseError
 from boto.dynamodb2 import connect_to_region as ddb_connect_to_region
 from boto.rds import connect_to_region as rds_connect_to_region
 from boto.s3 import connect_to_region as s3_connect_to_region
@@ -289,7 +290,7 @@ def wait_rds(port=9324, **kwargs):
     return True
 
 
-def wait_s3(host="localhost", port=9324, **kwargs):
+def wait_s3(host="localhost", port=4567, **kwargs):
     """"Wait for s3 to be up.
 
         Args:
@@ -319,6 +320,11 @@ def wait_s3(host="localhost", port=9324, **kwargs):
         logger.error("Cannot connect to S3.")
         logger.error("Aborting")
         return False
+    except S3ResponseError as e:
+        if e.message == "The resource you requested does not exist"\
+           and e.reason == "Not Found"\
+           and e.status == 404:
+            return True
 
     logger.info("S3 is ready")
     return True
