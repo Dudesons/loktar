@@ -41,7 +41,7 @@ def test_strategy_run_fail_on_find_plugin(mocker, package, run_type):
         strategy_runner(package, run_type)
 
 
-@pytest.mark.parametrize("package", [{"pkg_type": "foo", "test_type": "bar"}])
+@pytest.mark.parametrize("package", [{"pkg_type": "foo", "test_type": "artifact"}])
 @pytest.mark.parametrize("run_type", ["test", "artifact"])
 def test_strategy_run_fail_on_runner(mocker, package, run_type):
     class Fake(object):

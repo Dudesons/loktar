@@ -1,7 +1,7 @@
 from github import GithubException
 from mock import MagicMock
 import pytest
-
+from uuid import uuid4
 
 class File(object):
 
@@ -132,3 +132,49 @@ def no_sleep(monkeypatch):
 @pytest.fixture(autouse=True)
 def no_exit(monkeypatch):
     monkeypatch.setattr("sys.exit", lambda x: False if x else True)
+
+
+class FakeElasticSearch(object):
+    def __init__(self, *args, **kwargs):
+        self.runs = list()
+
+    def index(self, *args, **kwargs):
+        run_id = str(uuid4())
+        self.runs.append({
+            u'_type': kwargs.get("doc_type"),
+            u'_source': kwargs.get("body"),
+            u'_index': kwargs.get("index"),
+            u'_version': 1,
+            u'found': True,
+            u'_id': run_id
+        })
+
+        return {
+            u'_type': kwargs.get("type"),
+            u'created': True,
+            u'_shards': {
+                u'successful': 1,
+                u'failed': 0,
+                u'total': 2
+            },
+            u'_version': 1,
+            u'_index': kwargs.get("index"),
+            u'_id': run_id
+        }
+
+    def get(self, *args, **kwargs):
+        for run in self.runs:
+            if run["_id"] == kwargs.get("id"):
+                return run
+
+    def search(self, *args, **kwargs):
+        return {
+            u'hits': {
+                u'hits': self.runs,
+                u'total': len(self.runs),
+                u'max_score': 1.0
+            },
+            u'_shards': {u'successful': 5, u'failed': 0, u'total': 5},
+            u'took': 89,
+            u'timed_out': False
+        }
