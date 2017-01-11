@@ -1,0 +1,6 @@
+version: "2"
+
+services:
+  loktar:
+    volumes:
+      - ~/.pypirc:/root/.pypirc

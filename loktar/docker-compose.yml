@@ -1,0 +1,47 @@
+version: "2"
+
+services:
+  redis:
+    image: redis
+
+  s3:
+    image: quay.io/tinyclues/s3:master
+
+  sqs:
+    image: quay.io/tinyclues/sqs:master
+
+  elasticsearch:
+    #image: elasticsearch:2.4
+    image: elasticsearch:5.0
+
+
+  dynamodb:
+    image: quay.io/tinyclues/dynamodb:master
+
+  rds:
+    image: quay.io/tinyclues/rds:master
+    environment:
+      - POSTGRES_USER=tinyclues
+      - POSTGRES_DB=dev
+
+  etcd:
+    image: elcolio/etcd:2.0.10
+
+  mongo:
+    image: mongo:3.3
+
+  loktar:
+    build: .
+    volumes:
+      - ./src/:/src/
+    links:
+      - redis
+      - sqs
+      - dynamodb
+      - rds
+      - elasticsearch
+      - s3
+      - etcd
+      - mongo
+    environment:
+      - "PYTHONPATH=$PYTHONPATH:/src"
