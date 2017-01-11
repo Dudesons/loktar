@@ -54,7 +54,7 @@ def wait_ssh(host="localhost", port=22, retries=30, sleep=10, **kwargs):
             logger.warning(str(e))
             logger.warning("SSH server is not up yet")
             time.sleep(sleep)
-    
+
     logger.error("Cannot connect to ssh server")
     logger.error("Aborting")
     return False
@@ -328,3 +328,37 @@ def wait_s3(host="localhost", port=4567, **kwargs):
 
     logger.info("S3 is ready")
     return True
+
+
+def wait_http_services(host="localhost", port=80, retries=30, sleep=10, secure=False, **kwargs):
+    """Wait for API to be up.
+
+    Args:
+        host (str): Host name. Default to "localhost".
+        port (int): Service port. Defaults to 80.
+        retries (int): Maximum number of retries. Defaults to 30.
+        sleep (int): Time of sleep between retries, in seconds. Defaults to 10 seconds.
+        secure (bool): Secure communication. Defaults to False.
+        kwargs (dict): To pass additional check information
+    Returns:
+       bool: True if it is ready, False if something went wrong
+
+    """
+    for i in range(0, retries):
+        try:
+            res = requests.get("{}://{}:{}{}".format("https" if secure else "http", host, port, "/" if not kwargs.get("url_path") else "/" + kwargs.get("url_path")))
+        except requests.exceptions.ConnectionError:
+            logger.warning("{} service is not up yet.".format(kwargs.get("service_name") or 'UNNAMED'))
+            time.sleep(sleep)
+            continue
+
+        logger.info("{} service is up, checking status.".format(kwargs.get("service_name") or 'UNNAMED'))
+        health = res.status_code
+        if health == 200:
+            return True
+        else:
+            logger.info("health status: {}".format(health))
+
+    logger.error("Cannot connect to service {}.".format(kwargs.get("service_name") or 'UNNAMED'))
+    logger.error("Aborting")
+    return False

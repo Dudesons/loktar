@@ -14,6 +14,7 @@ from loktar.check import wait_redis
 from loktar.check import wait_s3
 from loktar.check import wait_sqs
 from loktar.check import wait_ssh
+from loktar.check import wait_http_services
 
 from loktar.check import requests as mp_requests
 
@@ -23,13 +24,13 @@ def test_wait_dynamodb(mocker, fail):
     class FakeDDB(object):
         def __init__(self, *args, **kwargs):
             pass
-        
+
         def list_tables(self):
             if fail:
                 raise socket.gaierror
             else:
                 return list()
-    
+
     mocker.patch("loktar.check.ddb_connect_to_region", return_value=FakeDDB())
 
     if fail:
@@ -243,3 +244,30 @@ def test_wait_rds(mocker, fail):
         assert wait_rds() is False
     else:
         assert wait_rds() is True
+
+@pytest.mark.parametrize("fail", [True, False])
+def test_http_services(monkeypatch, fail):
+    class FakeAPI(object):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        @property
+        def status_code(self):
+            return 200
+
+    def fake_request(*args, **kwargs):
+        if fail:
+            def t():
+                raise requests.exceptions.ConnectionError
+            return t()
+        else:
+            return FakeAPI()
+
+    monkeypatch.setattr(mp_requests, "get", lambda *args, **kwargs: fake_request())
+
+    is_ready = wait_http_services(port=80, retries=1, sleep=0.1, url_path="ping")
+
+    if fail:
+        assert is_ready is False
+    else:
+        assert is_ready is True
