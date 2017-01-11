@@ -45,12 +45,17 @@ clean-test:
 lint:
 	docker-compose run --no-deps loktar flake8 loktar
 
-test:
-	docker-compose run loktar py.test -s tests/
+test: unit-test integration-test
+
+unit-test:
+	docker-compose run --no-deps loktar py.test -s tests/unit
+
+integration-test:
+	docker-compose run loktar py.test -s tests/integration
 
 
 coverage:
-	docker-compose run loktar py.test -s --cov=loktar --cov-report html --cov-report xml --cov-config .coveragerc tests/
+	docker-compose run loktar py.test -s --cov=loktar --cov-report html --cov-report xml --cov-config .coveragerc tests/unit
 
 docs:
 	# rm -f docs/loktar.rst

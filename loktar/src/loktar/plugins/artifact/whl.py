@@ -2,7 +2,7 @@ from pypicloud_client.client import PypicloudClient
 
 from loktar.cmd import exe
 from loktar.cmd import exec_command_with_retry
-from loktar.environment import MAX_RETRY_PYTHON_UPLOAD
+from loktar.constants import MAX_RETRY_PYTHON_UPLOAD
 from loktar.exceptions import CIBuildPackageFail
 from loktar.plugin import ComplexPlugin
 
@@ -84,7 +84,7 @@ class Whl(ComplexPlugin):
             """Create & upload the package
 
             """
-            with self.cwd(self.package_info["package_location"]):
+            with self.cwd(self.path):
                 # Edit the package version
                 if not exe("sed -i 's/VERSION = .*/VERSION = \"{0}\"/g' setup.py"
                            .format(self.share_memory["latest_version"]), remote=self.remote):

@@ -11,7 +11,7 @@ from loktar.dependency import get_do_not_touch_artifacts
 from loktar.dependency import get_excluded_deps
 from loktar.dependency import get_artifact_requirements
 from loktar.dependency import artifact_from_path
-from loktar.dependency import pull_request_information
+#from loktar.dependency import pull_request_information
 from loktar.job import build_params_to_context
 
 repo_path = '/repo/'
@@ -237,11 +237,11 @@ def test_get_do_not_touch_artifacts(include_root, rebuild):
         assert do_not_touch_artifact == set()
 
 
-def test_pull_request_information(mocker):
-    mocker.patch('loktar.dependency.Github')
-    mocker.patch('loktar.dependency.fetch_github_file')
-    mocker.patch('loktar.dependency.json')
-    mocker.patch('loktar.dependency.gen_dependencies_level', return_value=(True, ['lala']), autospec=True)
-    pull_request_information(0, 'workspace')
-    with pytest.raises(ValueError):
-        pull_request_information(None, 'workspace')
+# def test_pull_request_information(mocker):
+#     mocker.patch('loktar.dependency.Github')
+#     mocker.patch('loktar.dependency.fetch_github_file')
+#     mocker.patch('loktar.dependency.json')
+#     mocker.patch('loktar.dependency.gen_dependencies_level', return_value=(True, ['lala']), autospec=True)
+#     pull_request_information(0, 'workspace')
+#     with pytest.raises(ValueError):
+#         pull_request_information(None, 'workspace')

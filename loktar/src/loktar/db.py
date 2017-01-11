@@ -1,30 +1,35 @@
-import os
-import pickle
-import redis
+from loktar.constants import RUN_DB
+from loktar.log import Log
+
+from elasticsearch import Elasticsearch
+
+logger = Log()
 
 
-class Job(object):
+class Run(object):
     def __init__(self):
-        self.host = os.environ.get("LOKTAR_JOB_DB_URI", "localhost")
-        self.port = os.environ.get("LOKTAR_JOB_DB_PORT", 6379)
-        self.db = os.environ.get("LOKTAR_JOB_DB_NAME", 0)
-        self.expire = os.environ.get("LOKTAR_JOB_EXPIRE", 86400)
-        self._db = redis.StrictRedis(host=self.host, port=self.port, db=self.db)
-        self._pipeline = self._db.pipeline()
+        self.host = RUN_DB["host"]
+        self.port = RUN_DB["port"]
+        self.db = RUN_DB["db"]
+        self.table = RUN_DB["table"]
+        self._db_connection = Elasticsearch(host=self.host, port=self.port)
 
-    def set_job(self, job_id, job_payload):
+    def set_run(self, job_payload):
         """Save job information in a db
 
         Args:
-            job_id (str): the id of the current job
             job_payload (dict): the payload of the job who is store in the db
 
         Return:
-             boolean, if the set on the db is ok True or if it failed False
+             the id of the job document
         """
-        return self._db.set(job_id, pickle.dumps(job_payload), ex=self.expire)
+        result = self._db_connection.index(index=self.db, doc_type=self.table, body=job_payload)
+        logger.info("Run indexation id:{}, shards_successful:{} shards_failed:{}".format(result["_id"],
+                                                                                         result["_shards"]["successful"],
+                                                                                         result["_shards"]["failed"]))
+        return result["_id"]
 
-    def get_job(self, job_id):
+    def get_run(self, job_id):
         """Get a specific job payload
 
         Args:
@@ -33,15 +38,23 @@ class Job(object):
         Return:
              dict, return the job payload
         """
-        return pickle.loads(self._db.get(job_id))
+        result = self._db_connection.get(index=self.db, doc_type=self.table, id=job_id)
+        logger.info("Get run with id: {}".format(result["_id"]))
+        return result["_source"]
 
-    def get_jobs(self):
+    def get_runs(self, page=0, size=10):
         """Get information on all jobs
 
         Return:
              list, who represents all payload for current job
         """
-        for job_id in self._db.scan_iter():
-            self._pipeline.get(job_id)
+        result = self._db_connection.search(index=self.db,
+                                            doc_type=self.table,
+                                            from_=0 if page == 0 else (page + 1) * size,
+                                            size=size,
+                                            sort="start_time:desc")
 
-        return map(pickle.loads, self._pipeline.execute())
+        logger.info("The runs requests took {}ms for a size of {}".format(result["took"], size))
+
+        return [hit["_source"] for hit in result["hits"]["hits"]]
+
