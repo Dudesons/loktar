@@ -16,9 +16,11 @@ ssh-import-id==3.21
 boto==2.39.0
 cffi==1.6.0
 pycrypto==2.6.1
-pypicloud_client==3
+pypicloud_client==5
 slacker==0.9.21
 quay_client==7
 bravado==8.1.2
 python-etcd==0.4.3
 pymongo==2.8
+smart-getenv==1.1.0
+elasticsearch==5.0.0

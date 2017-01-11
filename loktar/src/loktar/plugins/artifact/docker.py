@@ -4,10 +4,10 @@ from quay_client import QuayError
 from uuid import uuid4
 
 from loktar.cmd import exe
-from loktar.environment import AWS
-from loktar.environment import CI
-from loktar.environment import QUAY
-from loktar.environment import STORAGE_PROXY
+from loktar.constants import AWS
+from loktar.constants import CI
+from loktar.constants import QUAY
+from loktar.constants import STORAGE_PROXY
 from loktar.exceptions import CIBuildPackageFail
 from loktar.plugin import ComplexPlugin
 from loktar.store import store_artifact

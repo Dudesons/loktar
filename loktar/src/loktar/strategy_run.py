@@ -1,14 +1,14 @@
-from loktar.environment import PLUGINS_INFO
+from loktar.constants import PLUGINS_INFO
 from loktar.exceptions import CIBuildPackageFail
 from loktar.exceptions import CITestFail
 from loktar.exceptions import ImportPluginError
 from loktar.log import Log
 from loktar.plugin import find_plugin
 
-ACCEPT_RUN_TYPE = ["test", "artifact", ]
+ACCEPT_RUN_TYPE = ["test", "artifact", "dependency"]
 
 
-def strategy_runner(package, run_type, remote=False):
+def strategy_runner(package, run_type, remote=False, **kwargs):
     """Run the packaging functions
 
         Args:
@@ -25,29 +25,46 @@ def strategy_runner(package, run_type, remote=False):
 
     logger = Log()
 
-    if run_type not in ACCEPT_RUN_TYPE:
-        raise ValueError("run_type must be equal to 'test' or 'artifact', actual value: {0}".format(run_type))
+    if run_type in ["test", "artifact"]:
 
-    elif run_type == "test" and package["test_type"] == "no-test":
-        logger.info("Tag no-test detected, skip test")
-        return {}
-    else:
+        if run_type == "test" and package["test_type"] == "no-test":
+            logger.info("Tag no-test detected, skip test")
+            return {}
+
         params = {"type": "test_type", "exception": CITestFail}\
             if run_type == "test" else {"type": "pkg_type", "exception": CIBuildPackageFail}
 
-        plugins_location = PLUGINS_INFO["locations"].split(",") \
-            if type(PLUGINS_INFO["locations"]) is str else PLUGINS_INFO["locations"]
-
         try:
-            runner = find_plugin(package[params["type"]], run_type, plugins_location, PLUGINS_INFO["workspace"])
+            plugin = find_plugin(package[params["type"]],
+                                 run_type,
+                                 PLUGINS_INFO["locations"],
+                                 PLUGINS_INFO["workspace"])
             logger.info("The plugin {} is loaded".format(package[params["type"]]))
         except ImportPluginError:
             raise
 
         logger.info("Starting {} plugin ...".format(package[params["type"]]))
-
         try:
-            return runner.run(package, remote)
+            return plugin.run(package, remote)
         except Exception as e:
             logger.error(str(e))
             raise params["exception"](str(e))
+
+    elif run_type == "dependency":
+        dependencies = set(package["depends_on"])
+
+        for plugin_type in package["dependencies_type"]:
+            try:
+                plugin = find_plugin(plugin_type,
+                                     run_type,
+                                     PLUGINS_INFO["locations"],
+                                     PLUGINS_INFO["workspace"])
+                logger.info("The plugin {} is loaded".format(plugin_type))
+            except ImportPluginError:
+                raise
+
+            dependencies |= plugin.Plugin(kwargs.get("basepath"))
+
+        return dependencies
+    else:
+        raise ValueError("run_type must be equal to {}, actual value: {}".format(", ".join(ACCEPT_RUN_TYPE), run_type))

@@ -11,7 +11,7 @@ from jenkinsapi.custom_exceptions import NotBuiltYet
 from jenkinsapi.jenkins import Jenkins
 from requests import HTTPError
 
-from loktar.environment import GITHUB_INFO
+from loktar.constants import GITHUB_INFO
 from loktar.exceptions import CIJobFail
 from loktar.log import Log
 from loktar.notifications import define_job_status_on_github_commit

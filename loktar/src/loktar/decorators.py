@@ -3,7 +3,7 @@ from __future__ import division
 import random
 import time
 
-from loktar.environment import RETRY_HTTP
+from loktar.constants import RETRY_HTTP
 from loktar.log import Log
 
 

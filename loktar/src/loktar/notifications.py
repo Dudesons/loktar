@@ -3,8 +3,8 @@ from slacker import Error
 from slacker import Slacker
 
 from loktar.decorators import retry
-from loktar.environment import GITHUB_INFO
-from loktar.environment import SLACK
+from loktar.constants import GITHUB_INFO
+from loktar.constants import SLACK
 from loktar.exceptions import NotificationError
 from loktar.log import Log
 

@@ -1,7 +1,7 @@
 import boto.s3 as s3
 
 from loktar.decorators import retry
-from loktar.environment import AWS
+from loktar.constants import AWS
 from loktar.exceptions import UnknownStorageMethod
 
 

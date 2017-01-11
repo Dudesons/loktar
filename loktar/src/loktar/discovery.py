@@ -1,5 +1,5 @@
-from loktar.dependency import package_from_path
-from loktar.environment import GITHUB_INFO
+from loktar.dependency import artifact_from_path
+from loktar.constants import GITHUB_INFO
 from loktar.exceptions import PrepareEnvFail
 from loktar.exceptions import SCMError
 from loktar.log import Log
@@ -13,12 +13,18 @@ def _find_modified_files_from_github(git_branch, **kwargs):
                     kwargs.get("github_password", GITHUB_INFO['login']['password']),
                     github_organization=kwargs.get("github_organization", GITHUB_INFO['organization']),
                     github_repository=kwargs.get("github_repository", GITHUB_INFO['repository']))
-
     try:
         if git_branch == "master":
             return github.get_modified_files_from_commit(kwargs.get("commit_id"))
         else:
-            return github.get_modified_files_from_pull_request(kwargs.get("pull_request_id"))
+            dict_message_files = github.get_commit_message_modified_files_on_pull_request(kwargs.get("pull_request_id"))
+            # Filter out Merge remote-tracking commits and Merge branch
+            dict_message_files = {key: value for key, value in dict_message_files.iteritems()
+                                  if (not key.startswith('Merge remote-tracking branch') and
+                                      not key.startswith('Merge branch'))}
+
+            # This is the git diff, concatenate the lists that are values of dict_message_files
+            return [item for _list in dict_message_files.values() for item in _list]
     except SCMError as e:
         logger.error(str(e))
         raise
@@ -42,4 +48,4 @@ def find_artifact_modified(git_branch, scm_type, ci_config, **kwargs):
 
     packages_map = {pkg["pkg_name"]: pkg for pkg in ci_config['packages']}
     # generate modified packages
-    return {package_from_path(path, packages_map) for path in git_diff} - {None}
+    return {artifact_from_path(path, packages_map) for path in git_diff} - {None}

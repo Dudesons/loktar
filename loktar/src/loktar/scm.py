@@ -1,11 +1,14 @@
+from fabric.api import lcd
 from github import Github as GitHub
 from github import GithubException
 from github import UnknownObjectException
+import os
 import requests
 import StringIO
 
+from loktar.cmd import exe
+from loktar.constants import GITHUB_INFO
 from loktar.decorators import retry
-from loktar.environment import GITHUB_INFO
 from loktar.exceptions import SCMError
 from loktar.log import Log
 
@@ -289,3 +292,12 @@ def fetch_github_file(url, token):
     m_file = StringIO.StringIO()
     m_file.write(req.content)
     return m_file.getvalue()
+
+
+def synchronize_branch_with_master(workspace, git_branch):
+    with lcd(os.path.join(workspace)):
+        exe("git checkout master", remote=False)
+        exe("git fetch origin", remote=False)
+        exe("git merge origin/master", remote=False)
+        exe("git checkout {0}".format(git_branch), remote=False)
+        exe("git merge origin/{}".format(git_branch), remote=False)
