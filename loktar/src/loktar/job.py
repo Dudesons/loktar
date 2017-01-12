@@ -23,19 +23,19 @@ logger = logging.getLogger(__name__)
 log = Log()
 
 
-def ci_downstream(ci_config, pkg_name, type_task, params, job_format="{0} - {1}"):
+def ci_downstream(ci_config, artifact_name, type_task, params, job_format="{0} - {1}"):
     """Send a job to the ci
 
     Args:
         ci_config: part of the config.json file under the ``'jenkins'`` key
-        pkg_name: name of the package to build
+        artifact_name: name of the package to build
         type_task: apparently only ``'superman'``
         params: parameters sent to jenkins
     """
     ci_server = jenkins.Jenkins(ci_config['host'],
                                 ci_config['user'],
                                 ci_config['password'])
-    ci_server.build_job(job_format.format(pkg_name, type_task), params)
+    ci_server.build_job(job_format.format(artifact_name, type_task), params)
 
 
 def job_manager(ci_config,

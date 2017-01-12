@@ -32,16 +32,16 @@ class SimplePlugin(object):
 
         try:
             assert "package_location" in package_info
-            self.path = "{0}/{1}".format(package_info["package_location"], package_info["pkg_dir"]) \
-                        if "pkg_dir" in package_info else package_info["package_location"]
+            self.path = "{0}/{1}".format(package_info["package_location"], package_info["artifact_dir"]) \
+                        if "artifact_dir" in package_info else package_info["package_location"]
         except AssertionError:
-            if "pkg_dir" in package_info:
+            if "artifact_dir" in package_info:
                 self.path = "{0}/{1}/{2}".format(ROOT_PATH["container"],
-                                                 package_info["pkg_dir"],
-                                                 package_info["pkg_name"])
+                                                 package_info["artifact_dir"],
+                                                 package_info["artifact_name"])
             else:
                 self.path = "{0}/{1}".format(ROOT_PATH["container"],
-                                             package_info["pkg_name"])
+                                             package_info["artifact_name"])
 
         try:
             assert "run" in self.config["command"] and "clean" in self.config["command"]

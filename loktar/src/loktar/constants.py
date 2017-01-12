@@ -121,7 +121,12 @@ CI = {
 
 
 DEPENDENDY_GRAPH = {
-    ""
+    "repo": getenv("LOKTAR_CI_DEPENDENCY_GRAPH_REPO", type=str, default="/tmp")
 }
 
-DETECT_PR_COLLISION = getenv("LOKTAR_DETECT_PR_COLLISION")
+DETECT_PR_COLLISION = getenv("LOKTAR_DETECT_PR_COLLISION", type=bool, default=False)
+
+GUAY = {
+    "host": getenv("LOKTAR_GUAY_HOST", type=str, default=None),
+    "timeout": getenv("LOKTAR_GUAY_TIMEOUT", type=int, default=1800)
+}

@@ -88,7 +88,7 @@ def get_config(package_name, test_env_path, full=False):
 
     Returns:
         if ``full`` True, return the complete config.json file.
-        Otherwise, return a dict with keys: ``['pkg_name', 'pkg_type', 'test_type']``
+        Otherwise, return a dict with keys: ``['artifact_name', 'artifact_type', 'test_type']``
     """
     pkg_config = {}
     logger = Log()
@@ -99,7 +99,7 @@ def get_config(package_name, test_env_path, full=False):
     logger.info('Parsing configuration')
     if not full:
         for package in config['packages']:
-            if package['pkg_name'] == package_name:
+            if package['artifact_name'] == package_name:
                 pkg_config = package
                 break
     else:

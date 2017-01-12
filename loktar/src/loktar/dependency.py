@@ -2,31 +2,25 @@ import copy
 from fabric.api import lcd
 from fabric.api import local
 from itertools import product
-import json
 import matplotlib
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 import os
 import time
-import urllib
 
-from loktar.decorators import retry
-from loktar.constants import GITHUB_INFO
-from loktar.constants import GITHUB_TOKEN
+from loktar.constants import DEPENDENDY_GRAPH
 from loktar.exceptions import CIJobFail
 from loktar.exceptions import FailDrawDepGraph
 from loktar.log import Log
 from loktar.parser import parse_statuses
-from loktar.scm import fetch_github_file
-from loktar.scm import Github
 from loktar.strategy_run import strategy_runner
 
 logger = Log()
 
 
 def get_excluded_deps(artifacts, dict_message_files, modified_artifacts):
-    """Compute which artifact's dependencies should be ignored based on commit messages.
+    """Compute which artifact"s dependencies should be ignored based on commit messages.
 
     This does not take into account modified dependencies of an artifact whose dependencies are excluded.
     We only need to know if an artifacts non-modified dependencies should be ignored or not, the rest is
@@ -42,15 +36,15 @@ def get_excluded_deps(artifacts, dict_message_files, modified_artifacts):
         set of str: items are artifacts names whose dependencies must not be added to the dependency graph
 
     Examples:
-        >>> get_excluded_deps({'artifact': {'exclude_dependencies_only_on_keywords': ['CLN', 'BLD']}},
-        ... {'CLN/BLD: Cleaned some files. I do not care about dependencies': 'artifact/modified.py'},
-        ... {'artifact'})
-        {'artifact'}
+        >>> get_excluded_deps({"artifact": {"exclude_dependencies_only_on_keywords": ["CLN", "BLD"]}},
+        ... {"CLN/BLD: Cleaned some files. I do not care about dependencies": "artifact/modified.py"},
+        ... {"artifact"})
+        {"artifact"}
 
-        >>> get_excluded_deps({'artifact': {'exclude_dependencies_only_on_keywords': ['CLN', 'BLD']}},
-        ... {'BUG: Fixed a serious bug! This should rebuild dependencies': 'artifact/modified.py'},
+        >>> get_excluded_deps({"artifact": {"exclude_dependencies_only_on_keywords": ["CLN", "BLD"]}},
+        ... {"BUG: Fixed a serious bug! This should rebuild dependencies": "artifact/modified.py"},
         ... {})
-        {'artifact'}
+        {"artifact"}
     """
 
     if not dict_message_files:
@@ -65,9 +59,9 @@ def get_excluded_deps(artifacts, dict_message_files, modified_artifacts):
             if artifact_name is None:
                 continue
             # If we have set an exclude condition and this condition is matched
-            elif 'exclude_dependencies_only_on_keywords' in artifacts[artifact_name]:
-                keywords = {key.strip() for key in commit_message.split(':')[0].split('/')}
-                keywords_exclude = set(artifacts[artifact_name]['exclude_dependencies_only_on_keywords'])
+            elif "exclude_dependencies_only_on_keywords" in artifacts[artifact_name]:
+                keywords = {key.strip() for key in commit_message.split(":")[0].split("/")}
+                keywords_exclude = set(artifacts[artifact_name]["exclude_dependencies_only_on_keywords"])
                 # If there is a keyword that is not excluded
                 if keywords - keywords_exclude:
                     exclude_dep -= {artifact_name}
@@ -87,7 +81,7 @@ def artifact_from_path(path, artifacts):
         the artifact name or None if the path is not inside an artifact
     """
     for artifact_name, config in artifacts.iteritems():
-        if 'pkg_dir' in config and path.startswith(os.path.join(config['pkg_dir'], artifact_name)):
+        if "artifact_dir" in config and path.startswith(os.path.join(config["artifact_dir"], artifact_name)):
             return artifact_name
         elif path.startswith(artifact_name):
             return artifact_name
@@ -102,10 +96,10 @@ def artifact_path(artifact):
     Returns:
         str: The artifact path relative to the repository root.
     """
-    if 'pkg_dir' in artifact:
-        return os.path.join(artifact['pkg_dir'], artifact['pkg_name'])
+    if "artifact_dir" in artifact:
+        return os.path.join(artifact["artifact_dir"], artifact["artifact_name"])
     else:
-        return artifact['pkg_name']
+        return artifact["artifact_name"]
 
 
 def graph_edges(artifacts_requirements, modified_artifacts, exclude_dep_from_artifacts):
@@ -200,7 +194,7 @@ def get_artifact_requirements(artifact_name, artifacts, repo_path):
     requirements &= set(artifacts.keys())
 
     if not requirements:
-        logger.info('No internal requirements found for artifact {0} in {1}'.format(artifact_name, build_deps_path))
+        logger.info("No internal requirements found for artifact {0} in {1}".format(artifact_name, build_deps_path))
 
     return requirements
 
@@ -272,7 +266,7 @@ def dependencies_layout(dependencies_levels, scale=1):
             pos_artifacts_x = np.concatenate((pos_artifacts_x, np.zeros(len(level)) + level_i * scale))
             pos_artifacts_y = np.concatenate((pos_artifacts_y,
                                              np.linspace(0, scale * len(level), len(level)) - scale * len(level) / 2.))
-        # We put this component on top of the previous one, adding a 'scale' margin
+        # We put this component on top of the previous one, adding a "scale" margin
         pos_artifacts_y += 3 * scale + component_top
         # We update the total height
         component_top = pos_artifacts_y.max()
@@ -304,10 +298,10 @@ def gplot(graph, dependencies_levels, save_path=None, output_type=None):
         logger.info("Storing {0}.{1} in {2}".format(name_file, output_type, save_path))
 
     if output_type == "png":
-        matplotlib.use('Agg')
+        matplotlib.use("Agg")
         logger.info("Drawing the graph")
         plt.figure(figsize=(12, 14))
-        nx.draw_networkx(graph, pos=dependencies_layout(dependencies_levels), edge_color='g', node_size=3000)
+        nx.draw_networkx(graph, pos=dependencies_layout(dependencies_levels), edge_color="g", node_size=3000)
         plt.savefig(final_path)
         logger.info("The graph is drawn")
     elif output_type == "dot":
@@ -340,16 +334,16 @@ def gen_dependencies_level(directed_graph, draw=False):
     try:
         assert nx.is_directed_acyclic_graph(directed_graph)
     except AssertionError:
-        logger.error('A cycle has been detected in the graph.')
+        logger.error("A cycle has been detected in the graph.")
         return False, None,
 
-    logger.info('Generating the dependency levels')
+    logger.info("Generating the dependency levels")
 
     dependencies_levels = [output_levels(comp) for comp in get_directed_components(directed_graph)]
-    logger.info('The dependency levels have been generated')
+    logger.info("The dependency levels have been generated")
     if draw:
-        name_file = gplot(directed_graph, dependencies_levels, save_path='/home/pwned/ci_img', output_type='png')
-        with lcd("/home/pwned/ci_img"):
+        name_file = gplot(directed_graph, dependencies_levels, save_path=DEPENDENDY_GRAPH["repo"], output_type="png")
+        with lcd(DEPENDENDY_GRAPH["repo"]):
             local("git checkout master")
             local("git fetch origin")
             local("git merge origin/master")
@@ -377,13 +371,13 @@ def get_do_not_touch_artifacts(id_pr, artifacts, scm, dep_graph, rebuild=False):
         set: Set of artifacts that should not be touched
     """
 
-    if rebuild:  # If rebuild is True, we only consider the last commit's statuses
+    if rebuild:  # If rebuild is True, we only consider the last commit"s statuses
         last_status_commit, statuses = scm.get_last_statuses_from_pull_request(id_pr, exclude_head=False)
         pr = scm.get_pull_request(id_pr)
         if last_status_commit.sha == pr.head.sha:
             modified_artifacts_last_commits = set()
         else:
-            raise CIJobFail('Cannot rebuild if no build was launched in the first place.')
+            raise CIJobFail("Cannot rebuild if no build was launched in the first place.")
 
     else:  # Otherwise, we get the last commit that has statuses before the last commit of the pull request
         last_status_commit, statuses = scm.get_last_statuses_from_pull_request(id_pr)
@@ -396,9 +390,9 @@ def get_do_not_touch_artifacts(id_pr, artifacts, scm, dep_graph, rebuild=False):
 
     green_builds, red_builds = parse_statuses(statuses)
 
-    logger.info('artifacts with green builds: {0}'.format(green_builds))
-    logger.info('artifacts with red builds: {0}'.format(red_builds))
-    logger.info('artifacts modified in the last commit: {0}'.format(modified_artifacts_last_commits))
+    logger.info("artifacts with green builds: {0}".format(green_builds))
+    logger.info("artifacts with red builds: {0}".format(red_builds))
+    logger.info("artifacts modified in the last commit: {0}".format(modified_artifacts_last_commits))
 
     # artifacts that should not be touched are artifact that got completely green builds
     # and that were not modified during the last commit
@@ -410,7 +404,7 @@ def get_do_not_touch_artifacts(id_pr, artifacts, scm, dep_graph, rebuild=False):
         # This is used to avoid the case where the root(s) of the graph (set of nodes that are topologically less
         # than every other node) are not modified, then creating a path where there is an artifact not in
         # do_not_touch_artifacts and solving the corner case of the path algorithm.
-        null_node = '__null__'
+        null_node = "__null__"
         augmented_dep_graph = copy.deepcopy(dep_graph)
         augmented_dep_graph.add_edges_from([(null_node, node) for node in augmented_dep_graph.nodes()])
         do_not_touch_artifacts |= {null_node}
@@ -432,6 +426,6 @@ def get_do_not_touch_artifacts(id_pr, artifacts, scm, dep_graph, rebuild=False):
         do_not_touch_artifacts -= have_incomplete_path
         do_not_touch_artifacts -= {null_node}
 
-        logger.info('artifacts that have an incomplete path directed to them: {0}'.format(have_incomplete_path))
-    logger.info('artifacts that should not be touched: {0}'.format(do_not_touch_artifacts))
+        logger.info("artifacts that have an incomplete path directed to them: {0}".format(have_incomplete_path))
+    logger.info("artifacts that should not be touched: {0}".format(do_not_touch_artifacts))
     return do_not_touch_artifacts

@@ -46,6 +46,6 @@ def find_artifact_modified(git_branch, scm_type, ci_config, **kwargs):
     else:
         raise PrepareEnvFail("The scm type {} is unknown for searching artifacts".format(scm_type))
 
-    packages_map = {pkg["pkg_name"]: pkg for pkg in ci_config['packages']}
+    packages_map = {pkg["artifact_name"]: pkg for pkg in ci_config['packages']}
     # generate modified packages
     return {artifact_from_path(path, packages_map) for path in git_diff} - {None}

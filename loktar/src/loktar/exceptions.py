@@ -73,3 +73,11 @@ class NotificationError(LoktarException):
 
 class SCMError(LoktarException):
     """Exception raised when an error is encountered with scm system"""
+
+
+class GuayError(LoktarException):
+    """Exception raised when an error is encountered with Guay build system"""
+
+
+class StorageProxyError(LoktarException):
+    """Exception raised when an error is encountered with storage proxy system"""
