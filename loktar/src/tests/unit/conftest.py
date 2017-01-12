@@ -178,10 +178,3 @@ class FakeElasticSearch(object):
             u'took': 89,
             u'timed_out': False
         }
-
-
-@pytest.fixture
-def mock_swagger_client_obj(mocker):
-    swagger_client_mock = mocker.patch('loktar.plugins.artifact.docker.SwaggerClient')
-
-    return swagger_client_mock
