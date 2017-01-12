@@ -27,7 +27,7 @@ def strategy_runner_deps(artifact_config, run_type, **kwargs):
 
     if target == os.path.join(repo_path, 'some_dir', 'my_biglibrary'):
         return {'some_dep'}
-    elif target == os.path.join(repo_path, 'some_pkg_dir', 'artifact1'):
+    elif target == os.path.join(repo_path, 'some_artifact_dir', 'artifact1'):
         return {'my_smalllibrary', 'my_biglibrary'}
     elif target == os.path.join(repo_path, 'my_smalllibrary'):
         return {'my_biglibrary'}
@@ -39,30 +39,30 @@ def strategy_runner_deps(artifact_config, run_type, **kwargs):
 
 @pytest.mark.parametrize('path,artifact,expected', [
     ('some_dir/artifact/my_youtube_uploader/youtube_uploader.py',
-     {'pkg_dir': 'some_dir', 'pkg_name': 'artifact'},
+     {'artifact_dir': 'some_dir', 'artifact_name': 'artifact'},
      'artifact'),
     ('artifact/my_youtube_uploader/youtube_uploader.py',
-     {'pkg_name': 'artifact'},
+     {'artifact_name': 'artifact'},
      'artifact'),
     ('artifact',
-     {'pkg_name': 'artifact'},
+     {'artifact_name': 'artifact'},
      'artifact'),
     ('tamere_en_slip/tamere_en_slip_lib/sextape.gropython',
-     {'pkg_name': 'artifact'},
+     {'artifact_name': 'artifact'},
      None)
 ])
 def test_artifact_from_path(path, artifact, expected):
-    artifacts = {artifact['pkg_name']: artifact}
+    artifacts = {artifact['artifact_name']: artifact}
     assert artifact_from_path(path, artifacts) == expected
 
 
 def test_get_artifact_requirements(mocker):
     l_repo_path = '/repo/'
-    artifacts = {'my_biglibrary': {'pkg_dir': 'some_dir', 'pkg_name': 'my_biglibrary', 'type': 'library'},
-                 'my_smalllibrary': {'pkg_name': 'my_smalllibrary', 'type': 'library'},
-                 'artifact1': {'pkg_name': 'artifact1', 'pkg_dir': 'some_pkg_dir'},
-                 'artifact2': {'pkg_name': 'artifact2'},
-                 'artifact3': {'pkg_name': 'artifact3'}}
+    artifacts = {'my_biglibrary': {'artifact_dir': 'some_dir', 'artifact_name': 'my_biglibrary', 'type': 'library'},
+                 'my_smalllibrary': {'artifact_name': 'my_smalllibrary', 'type': 'library'},
+                 'artifact1': {'artifact_name': 'artifact1', 'artifact_dir': 'some_artifact_dir'},
+                 'artifact2': {'artifact_name': 'artifact2'},
+                 'artifact3': {'artifact_name': 'artifact3'}}
 
     mocker.patch('loktar.dependency.strategy_runner', side_effect=strategy_runner_deps)
 
@@ -91,11 +91,11 @@ def test_dependency_graph_from_modified_artifact(mocker, exclude):
     # However if my_biglibrary's dependencies are _not_ excluded, the graph should be the same as above.
 
     modified_artifact = {'my_biglibrary', 'artifact2', 'artifact3'}
-    artifacts = {'my_biglibrary': {'pkg_dir': 'some_dir', 'pkg_name': 'my_biglibrary'},
-                 'my_smalllibrary': {'pkg_name': 'my_smalllibrary'},
-                 'artifact1': {'pkg_name': 'artifact1', 'pkg_dir': 'some_pkg_dir'},
-                 'artifact2': {'pkg_name': 'artifact2'},
-                 'artifact3': {'pkg_name': 'artifact3'}}
+    artifacts = {'my_biglibrary': {'artifact_dir': 'some_dir', 'artifact_name': 'my_biglibrary'},
+                 'my_smalllibrary': {'artifact_name': 'my_smalllibrary'},
+                 'artifact1': {'artifact_name': 'artifact1', 'artifact_dir': 'some_artifact_dir'},
+                 'artifact2': {'artifact_name': 'artifact2'},
+                 'artifact3': {'artifact_name': 'artifact3'}}
     exclude_dep_from_artifact = {'my_biglibrary'} if exclude else None
 
     mocker.patch('loktar.dependency.strategy_runner', side_effect=strategy_runner_deps)

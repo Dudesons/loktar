@@ -5,8 +5,8 @@ from loktar.strategy_run import strategy_runner
 
 
 @pytest.mark.parametrize("package", [
-    {"pkg_type": "foo", "test_type": "bar", "depends_on": ["intranet"], "dependencies_type": ["python"]},
-    {"pkg_type": "foo2", "test_type": "no-test", "depends_on": ["intranet"], "dependencies_type": ["python"]}
+    {"artifact_type": "foo", "test_type": "bar", "depends_on": ["intranet"], "dependencies_type": ["python"]},
+    {"artifact_type": "foo2", "test_type": "no-test", "depends_on": ["intranet"], "dependencies_type": ["python"]}
 ])
 @pytest.mark.parametrize("run_type", ["test", "artifact", "dependency"])
 @pytest.mark.parametrize("remote", [True, False])
@@ -31,7 +31,7 @@ def test_strategy_run(mocker, package, run_type, remote):
 
 
 @pytest.mark.parametrize("package", [
-    {"pkg_type": "foo", "test_type": "bar", "depends_on": ["intranet"], "dependencies_type": ["python"]}
+    {"artifact_type": "foo", "test_type": "bar", "depends_on": ["intranet"], "dependencies_type": ["python"]}
 ])
 def test_strategy_run_fail_on_value_error_run_type(package):
     with pytest.raises(ValueError):
@@ -39,7 +39,7 @@ def test_strategy_run_fail_on_value_error_run_type(package):
 
 
 @pytest.mark.parametrize("package", [
-    {"pkg_type": "foo", "test_type": "bar", "depends_on": ["intranet"], "dependencies_type": ["python"]}
+    {"artifact_type": "foo", "test_type": "bar", "depends_on": ["intranet"], "dependencies_type": ["python"]}
 ])
 @pytest.mark.parametrize("run_type", ["test", "artifact", "dependency"])
 def test_strategy_run_fail_on_find_plugin(mocker, package, run_type):
@@ -52,7 +52,7 @@ def test_strategy_run_fail_on_find_plugin(mocker, package, run_type):
 
 
 @pytest.mark.parametrize("package", [
-    {"pkg_type": "foo", "test_type": "artifact", "depends_on": ["intranet"], "dependencies_type": ["python"]}
+    {"artifact_type": "foo", "test_type": "artifact", "depends_on": ["intranet"], "dependencies_type": ["python"]}
 ])
 @pytest.mark.parametrize("run_type", ["test", "artifact", "dependency"])
 def test_strategy_run_fail_on_runner(mocker, package, run_type):

@@ -14,8 +14,8 @@ from loktar.exceptions import SCMError
 @pytest.mark.parametrize("ci_config", [{
   "packages": [
     {
-      "pkg_type": "docker",
-      "pkg_name": "pkg0",
+      "artifact_type": "docker",
+      "artifact_name": "pkg0",
       "pgk_dir": "dir0",
       "test_type": "make",
       "type": "service",
@@ -26,8 +26,8 @@ from loktar.exceptions import SCMError
       }
     },
     {
-      "pkg_type": "docker",
-      "pkg_name": "pkg1",
+      "artifact_type": "docker",
+      "artifact_name": "pkg1",
       "test_type": "make",
       "type": "service",
       "build_info": {
@@ -37,8 +37,8 @@ from loktar.exceptions import SCMError
       }
     },
     {
-      "pkg_type": "whl",
-      "pkg_name": "pkg2",
+      "artifact_type": "whl",
+      "artifact_name": "pkg2",
       "pgk_dir": "dir2/subdir2/",
       "test_type": "make",
       "type": "service"
@@ -66,8 +66,8 @@ def test_find_artifact_modified(mock_github_obj, git_branch, scm_type, ci_config
 @pytest.mark.parametrize("ci_config", [{
   "packages": [
     {
-      "pkg_type": "docker",
-      "pkg_name": "pkg0",
+      "artifact_type": "docker",
+      "artifact_name": "pkg0",
       "pgk_dir": "dir0",
       "test_type": "make",
       "type": "service",
@@ -78,8 +78,8 @@ def test_find_artifact_modified(mock_github_obj, git_branch, scm_type, ci_config
       }
     },
     {
-      "pkg_type": "docker",
-      "pkg_name": "pkg1",
+      "artifact_type": "docker",
+      "artifact_name": "pkg1",
       "test_type": "make",
       "type": "service",
       "build_info": {
@@ -89,8 +89,8 @@ def test_find_artifact_modified(mock_github_obj, git_branch, scm_type, ci_config
       }
     },
     {
-      "pkg_type": "whl",
-      "pkg_name": "pkg2",
+      "artifact_type": "whl",
+      "artifact_name": "pkg2",
       "pgk_dir": "dir2/subdir2/",
       "test_type": "make",
       "type": "service"

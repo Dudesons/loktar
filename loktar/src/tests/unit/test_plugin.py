@@ -55,7 +55,7 @@ def example_plugin_bad():
     return Example
 
 
-@pytest.mark.parametrize("package_info", [{"pkg_name": "toto"}, {"pkg_name": "toto", "package_location": "/tmp"}])
+@pytest.mark.parametrize("package_info", [{"artifact_name": "toto"}, {"artifact_name": "toto", "package_location": "/tmp"}])
 def test_complex_plugin(mocker, example_plugin, package_info):
     mocker.patch("loktar.plugin.lcd")
     mocker.patch("loktar.plugin.exe")
@@ -69,7 +69,7 @@ def test_complex_plugin_fail_test_command(mocker, example_plugin):
     mocker.patch("loktar.plugin.exe", return_value=False)
 
     with pytest.raises(CITestFail):
-        test = example_plugin({"pkg_name": "toto"})
+        test = example_plugin({"artifact_name": "toto"})
         test.run()
 
 
@@ -78,7 +78,7 @@ def test_complex_plugin_fail_simple_plugin_error_configuration(mocker, example_p
     mocker.patch("loktar.plugin.exe")
 
     with pytest.raises(SimplePluginErrorConfiguration):
-        test = example_plugin_bad({"pkg_name": "toto"})
+        test = example_plugin_bad({"artifact_name": "toto"})
         test.run()
 
 
@@ -86,7 +86,7 @@ def test_complex_plugin_fail_forbidden_timeline_key(mocker, example_plugin):
     mocker.patch("loktar.plugin.lcd")
     mocker.patch("loktar.plugin.exe")
 
-    test = example_plugin({"pkg_name": "toto"})
+    test = example_plugin({"artifact_name": "toto"})
     test.timeline[50] = lambda x: x
     with pytest.raises(ForbiddenTimelineKey):
         test.run()

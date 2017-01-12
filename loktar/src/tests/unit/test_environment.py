@@ -8,7 +8,7 @@ from loktar.environment import PrepareEnvFail
 @pytest.mark.parametrize("full", [False, True])
 def test_get_config(mocker, full):
     mocker.patch("loktar.environment.lcd")
-    mocker.patch("loktar.environment.json", return_value={"packages": [{"pkg_name": "foobar"}]})
+    mocker.patch("loktar.environment.json", return_value={"packages": [{"artifact_name": "foobar"}]})
     mocker.patch("loktar.environment.local")
 
     get_config("foobar", "toto", full=full)
