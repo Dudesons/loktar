@@ -46,13 +46,13 @@ class _Jar(SimplePlugin):
             s3cmd = "{} aws s3 cp ./target/ s3://{}/jars/prod/{}/ --recursive --exclude '*' --include '*.jar'".format(
                 package_info["build_info"].get("prefix_command", ""),
                 package_info["build_info"]["bucket_name"],
-                package_info["pkg_name"]
+                package_info["artifact_name"]
             )
         else:
             s3cmd = "{} aws s3 cp ./target/ s3://{}/jars/dev/{}/{}/ --recursive --exclude '*' --include '*.jar'".format(
                 package_info["build_info"].get("prefix_command", ""),
                 package_info["build_info"]["bucket_name"],
-                package_info["pkg_name"],
+                package_info["artifact_name"],
                 package_info["mode"]
             )
 

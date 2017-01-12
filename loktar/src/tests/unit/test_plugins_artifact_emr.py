@@ -9,9 +9,9 @@ from loktar.plugins.artifact.emr import run
 @pytest.fixture()
 def ci_payload():
     payload = {
-        "pkg_name": "foobar",
+        "artifact_name": "foobar",
         "package_location": "/tmp",
-        "pkg_type": "emr",
+        "artifact_type": "emr",
         "build_info": {
             "input_type": "jar",
             "bucket_name": "foo-emr",

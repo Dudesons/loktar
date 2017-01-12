@@ -62,7 +62,7 @@ class Whl(ComplexPlugin):
                         lambda pkg_version: int(pkg_version.isdigit()),
                         map(
                             lambda pkg: pkg["version"],
-                            self.pypicloud.get_versions(self.package_info["pkg_name"])
+                            self.pypicloud.get_versions(self.package_info["artifact_name"])
                         )
                     )
 
@@ -76,9 +76,9 @@ class Whl(ComplexPlugin):
                 except IndexError:
                     self.share_memory["latest_version"] = 1
             else:
-                self.package_info["mode"] = self.package_info["mode"].replace("_", "-")
+                self.package_info["mode"] = self.package_info["mode"].replace("_", "-").replace("/", "-")
                 self.share_memory["latest_version"] = "0.{0}".format(self.package_info["mode"])
-                self.pypicloud.delete_package(self.package_info["pkg_name"], self.share_memory["latest_version"])
+                self.pypicloud.delete_package(self.package_info["artifact_name"], self.share_memory["latest_version"])
 
         def release(self):
             """Create & upload the package

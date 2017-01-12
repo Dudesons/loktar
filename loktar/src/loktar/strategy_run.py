@@ -32,7 +32,7 @@ def strategy_runner(package, run_type, remote=False, **kwargs):
             return {}
 
         params = {"type": "test_type", "exception": CITestFail}\
-            if run_type == "test" else {"type": "pkg_type", "exception": CIBuildPackageFail}
+            if run_type == "test" else {"type": "artifact_type", "exception": CIBuildPackageFail}
 
         try:
             plugin = find_plugin(package[params["type"]],

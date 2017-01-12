@@ -8,14 +8,14 @@ from loktar.plugins.test.make import run
 @pytest.mark.parametrize("remote", [True, False])
 def test_plugins_make(mocker, remote):
     mocker.patch("loktar.plugin.exe")
-    run({"pkg_name": "foobar", "package_location": "/tmp"}, remote)
+    run({"artifact_name": "foobar", "package_location": "/tmp"}, remote)
 
 
 @pytest.mark.parametrize("remote", [True, False])
 def test_plugins_make_fail_on_command(mocker, remote):
     mocker.patch("loktar.plugin.exe", return_value=False)
     with pytest.raises(CITestFail):
-        run({"pkg_name": "foobar", "package_location": "/tmp"}, remote)
+        run({"artifact_name": "foobar", "package_location": "/tmp"}, remote)
 
 
 def test_plugins_make_fail_on_call():
