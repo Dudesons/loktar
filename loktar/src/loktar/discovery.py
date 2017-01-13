@@ -1,5 +1,7 @@
-from loktar.dependency import artifact_from_path
 from loktar.constants import GITHUB_INFO
+from loktar.cmd import cwd
+from loktar.cmd import exe
+from loktar.dependency import artifact_from_path
 from loktar.exceptions import PrepareEnvFail
 from loktar.exceptions import SCMError
 from loktar.log import Log
@@ -30,6 +32,13 @@ def _find_modified_files_from_github(git_branch, **kwargs):
         raise
 
 
+def _find_modified_files_from_local_git(git_branch, **kwargs):
+    with cwd(kwargs.get("workspace"), remote=kwargs.get("remote")):
+        exe("git checkout {}".format(git_branch), remote=kwargs.get("remote"))
+        git_diff = exe("git diff HEAD~ HEAD --name-only", remote=kwargs.get("remote"))
+        return filter(None, list(set(git_diff.split("\n"))))
+
+
 def find_artifact_modified(git_branch, scm_type, ci_config, **kwargs):
     """Find artifact modified on a branch, PR ...
 
@@ -43,6 +52,8 @@ def find_artifact_modified(git_branch, scm_type, ci_config, **kwargs):
     """
     if scm_type == "github":
         git_diff = _find_modified_files_from_github(git_branch, **kwargs)
+    elif scm_type == "git":
+        git_diff = _find_modified_files_from_local_git(git_branch, **kwargs)
     else:
         raise PrepareEnvFail("The scm type {} is unknown for searching artifacts".format(scm_type))
 

@@ -55,7 +55,7 @@ integration-test:
 
 
 coverage:
-	docker-compose run loktar py.test -s --cov=loktar --cov-report html --cov-report xml --cov-config .coveragerc tests/unit
+	docker-compose run --no-deps loktar py.test -s --cov=loktar --cov-report html --cov-report xml --cov-config .coveragerc tests/unit
 
 docs:
 	# rm -f docs/loktar.rst

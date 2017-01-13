@@ -1,4 +1,6 @@
+from fabric.api import cd
 from fabric.api import local
+from fabric.api import lcd
 from fabric.api import run
 from fabric.api import settings
 
@@ -39,3 +41,7 @@ def exe(cmd, remote=True):
             logger.error(result)
             return False
         return True
+
+
+def cwd(path, remote=True):
+    return lcd if remote is False else cd
