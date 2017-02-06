@@ -1,4 +1,7 @@
 from loktar.job import context_to_build_params
+from loktar.log import Log
+
+logger = Log()
 
 
 def parse_statuses(statuses):
@@ -19,7 +22,8 @@ def parse_statuses(statuses):
         context = status.raw_data['context']
         try:
             package, type_build = context_to_build_params(context)
-        except ValueError:
+        except ValueError as exc:
+            logger.warning(str(exc))
             continue
         if status.state == 'success':
             green_builds |= {(package, type_build)}
