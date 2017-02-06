@@ -14,11 +14,11 @@ from loktar.log import Log
 
 
 class SimplePlugin(object):
-    def __init__(self, package_info, config, **kwargs):
+    def __init__(self, artifact_info, config, **kwargs):
         """Constructor for the SimplePlugin
 
             Args:
-                package_info (dict): represent all informations for the target package in the config.json
+                artifact_info (dict): represent all informations for the target package in the config.json
                 config (dict): this is the configuration plugin. It contains 2 keys 'run' & 'clean'.
 
             Raise:
@@ -27,21 +27,25 @@ class SimplePlugin(object):
         self.logger = Log()
         self.config = config
         self.remote = kwargs.get("remote", False)
-        self.package_info = package_info
+        self.artifact_info = artifact_info
         self.cwd = lcd if self.remote is False else cd
 
-        try:
-            assert "package_location" in package_info
-            self.path = "{0}/{1}".format(package_info["package_location"], package_info["artifact_dir"]) \
-                        if "artifact_dir" in package_info else package_info["package_location"]
-        except AssertionError:
-            if "artifact_dir" in package_info:
-                self.path = "{0}/{1}/{2}".format(ROOT_PATH["container"],
-                                                 package_info["artifact_dir"],
-                                                 package_info["artifact_name"])
+        root_location = artifact_info["artifact_root_location"] if "artifact_root_location" in artifact_info else ROOT_PATH["container"]
+
+        if "artifact_name" in artifact_info:
+            if "artifact_dir" in artifact_info:
+                self.path = "{0}/{1}/{2}".format(root_location,
+                                                 artifact_info["artifact_dir"],
+                                                 artifact_info["artifact_name"])
             else:
-                self.path = "{0}/{1}".format(ROOT_PATH["container"],
-                                             package_info["artifact_name"])
+                self.path = "{0}/{1}".format(root_location,
+                                             artifact_info["artifact_name"])
+        else:
+            if "artifact_dir" in artifact_info:
+                self.path = "{0}/{1}".format(root_location,
+                                             artifact_info["artifact_dir"])
+            else:
+                self.path = root_location
 
         try:
             assert "run" in self.config["command"] and "clean" in self.config["command"]
@@ -73,17 +77,17 @@ class SimplePlugin(object):
 
 
 class ComplexPlugin(SimplePlugin):
-    def __init__(self, package_info, config, **kwargs):
+    def __init__(self, artifact_info, config, **kwargs):
         """Constructor for the ComplexPlugin, child of SimplePlugin
 
         Args:
-            package_info (dict): represent all informations for the target package in the config.json
+            artifact_info (dict): represent all informations for the target package in the config.json
             config (dict): this is the configuration plugin. It contains 2 keys 'run' & 'clean'.
 
         Raise:
             SimplePluginErrorConfiguration: An error occurred when a key is missing in the configuration
         """
-        SimplePlugin.__init__(self, package_info, config, **kwargs)
+        SimplePlugin.__init__(self, artifact_info, config, **kwargs)
         self.timeline = dict()
         self.share_memory = dict()
         self.__origin = {

@@ -19,21 +19,21 @@ def run(*args, **kwargs):
 
 
 class Whl(ComplexPlugin):
-        def __init__(self, package_info, remote):
+        def __init__(self, artifact_info, remote):
             """Plugin for building python wheel package
 
                 Args:
-                    package_info (dict): Contains information about the package to execute inside the plugin
+                    artifact_info (dict): Contains information about the package to execute inside the plugin
                     remote (bool): Define if the plugin will be execute in remote or not
 
                 Raises:
                     CIBuildPackageFail: when one of the steps for packaging or uploading the package failed
             """
-            ComplexPlugin.__init__(self, package_info,
+            ComplexPlugin.__init__(self, artifact_info,
                                    {
                                        "command": {
                                            "run": None,
-                                           "clean": "make clean"
+                                           "clean": artifact_info.get("clean_method", "make clean")
                                        }
                                    },
                                    remote=remote)
@@ -56,13 +56,13 @@ class Whl(ComplexPlugin):
             """Get the next version for the current package
 
             """
-            if self.package_info["mode"] == "master":
+            if self.artifact_info["mode"] == "master":
                 try:
                     versions = filter(
                         lambda pkg_version: int(pkg_version.isdigit()),
                         map(
                             lambda pkg: pkg["version"],
-                            self.pypicloud.get_versions(self.package_info["artifact_name"])
+                            self.pypicloud.get_versions(self.artifact_info["artifact_name"])
                         )
                     )
 
@@ -76,9 +76,9 @@ class Whl(ComplexPlugin):
                 except IndexError:
                     self.share_memory["latest_version"] = 1
             else:
-                self.package_info["mode"] = self.package_info["mode"].replace("_", "-").replace("/", "-")
-                self.share_memory["latest_version"] = "0.{0}".format(self.package_info["mode"])
-                self.pypicloud.delete_package(self.package_info["artifact_name"], self.share_memory["latest_version"])
+                self.artifact_info["mode"] = self.artifact_info["mode"].replace("_", "-").replace("/", "-")
+                self.share_memory["latest_version"] = "0.{0}".format(self.artifact_info["mode"])
+                self.pypicloud.delete_package(self.artifact_info["artifact_name"], self.share_memory["latest_version"])
 
         def release(self):
             """Create & upload the package

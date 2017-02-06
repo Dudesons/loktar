@@ -81,7 +81,8 @@ JENKINS = {
 SLAVE_ENVIRONMENT = {
     "PATH": "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:{0}/.local/bin"
             .format(ROOT_PATH["container"]),
-    "env_file": getenv("LOKTAR_ENV_FILE", type=str, default=None)
+    "env_file": getenv("LOKTAR_SLAVE_ENVIRONMENT_ENV_FILE", type=str, default=None),
+    "ssh_image": getenv("LOKTAR_SLAVE_ENVIRONMENT_SSH_IMAGE", type=str, default=None),
 }
 
 AWS = {
