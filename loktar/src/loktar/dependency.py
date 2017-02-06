@@ -329,13 +329,14 @@ def gen_dependencies_level(directed_graph, draw=False):
         a tuple of
           - a boolean: True or False
           - a list of list with dependencies levels
+          - a string or None who represent the name of the image of the dep graph
     """
     name_file = None
     try:
         assert nx.is_directed_acyclic_graph(directed_graph)
     except AssertionError:
         logger.error("A cycle has been detected in the graph.")
-        return False, None,
+        return False, None, None
 
     logger.info("Generating the dependency levels")
 
@@ -372,16 +373,16 @@ def get_do_not_touch_artifacts(id_pr, artifacts, scm, dep_graph, rebuild=False):
     """
 
     if rebuild:  # If rebuild is True, we only consider the last commit"s statuses
-        last_status_commit, statuses = scm.get_last_statuses_from_pull_request(id_pr, exclude_head=False)
-        pr = scm.get_pull_request(id_pr)
+        last_status_commit, statuses = scm.get_last_statuses_from_pull_request(int(id_pr), exclude_head=False)
+        pr = scm.get_pull_request(int(id_pr))
         if last_status_commit.sha == pr.head.sha:
             modified_artifacts_last_commits = set()
         else:
             raise CIJobFail("Cannot rebuild if no build was launched in the first place.")
 
     else:  # Otherwise, we get the last commit that has statuses before the last commit of the pull request
-        last_status_commit, statuses = scm.get_last_statuses_from_pull_request(id_pr)
-        last_commits = scm.get_last_commits_from_pull_request(id_pr, until_commit=last_status_commit)
+        last_status_commit, statuses = scm.get_last_statuses_from_pull_request(int(id_pr))
+        last_commits = scm.get_last_commits_from_pull_request(int(id_pr), until_commit=last_status_commit)
         # Get the modified artifact in the last commit
         all_commit_files = [commit_file for commit in last_commits for commit_file in commit.files]
         modified_files = map(lambda file_: file_.filename, all_commit_files)
@@ -407,6 +408,8 @@ def get_do_not_touch_artifacts(id_pr, artifacts, scm, dep_graph, rebuild=False):
         null_node = "__null__"
         augmented_dep_graph = copy.deepcopy(dep_graph)
         augmented_dep_graph.add_edges_from([(null_node, node) for node in augmented_dep_graph.nodes()])
+        # Remove fake artifacts, to avoid error in the dependency graph manipulation
+        do_not_touch_artifacts &= set(artifacts.keys())
         do_not_touch_artifacts |= {null_node}
 
         # TODO(Simplify the path check. Some artifacts are checked several times)
