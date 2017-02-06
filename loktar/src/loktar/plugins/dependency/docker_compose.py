@@ -13,7 +13,8 @@ def docker_compose_deps(basepath):
     """
     services = list()
     for docker_compose_file in [os.path.join(basepath, item) for item in os.listdir(basepath) if "docker-compose" in item]:
-        services.extend(yaml.safe_load(docker_compose_file)["services"].keys())
+        with open(docker_compose_file) as fd:
+            services.extend(yaml.safe_load(fd.read())["services"].keys())
 
     return set(filter(None, services))
 
