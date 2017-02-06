@@ -24,7 +24,7 @@ def test_plugins_whl(mocker, mode, remote):
     mocker.patch("loktar.plugins.artifact.whl.exe")
     mocker.patch("loktar.plugins.artifact.whl.exec_command_with_retry")
     mocker.patch("loktar.plugin.exe")
-    run({"artifact_name": "foobar", "mode": mode, "package_location": "/tmp"}, remote)
+    run({"artifact_name": "foobar", "mode": mode, "artifact_root_location": "/tmp"}, remote)
 
 
 @pytest.mark.parametrize("mode", ["master", "foobar"])
@@ -35,7 +35,7 @@ def test_plugins_whl_fail_on_update_version(mocker, mode, remote):
     mocker.patch("loktar.plugins.artifact.whl.exec_command_with_retry")
     mocker.patch("loktar.plugin.exe")
     with pytest.raises(CIBuildPackageFail):
-        run({"artifact_name": "foobar", "mode": mode, "package_location": "/tmp"}, remote)
+        run({"artifact_name": "foobar", "mode": mode, "artifact_root_location": "/tmp"}, remote)
 
 
 @pytest.mark.parametrize("mode", ["master", "foobar"])
@@ -46,7 +46,7 @@ def test_plugins_whl_fail_on_release(mocker, mode, remote):
     mocker.patch("loktar.plugins.artifact.whl.exec_command_with_retry", return_value=False)
     mocker.patch("loktar.plugin.exe")
     with pytest.raises(CIBuildPackageFail):
-        run({"artifact_name": "foobar", "mode": mode, "package_location": "/tmp"}, remote)
+        run({"artifact_name": "foobar", "mode": mode, "artifact_root_location": "/tmp"}, remote)
 
 
 def test_plugins_whl_fail_on_call():
@@ -137,7 +137,7 @@ def test_plugins_whl_get_next_version(monkeypatch, mode, pypicloud_get_versions,
             "test_type": "make",
             "type": "library",
             "artifact_type": "whl",
-            "package_location": "/tmp/490847a2-326c-41c6-abb6-5765fc7544b3",
+            "artifact_root_location": "/tmp/490847a2-326c-41c6-abb6-5765fc7544b3",
             "mode": mode
 
         },

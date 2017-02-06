@@ -4,24 +4,22 @@ from loktar.plugins.dependency.docker_compose import docker_compose_deps
 
 
 def test_docker_compose(mocker, monkeypatch):
-    def fake_yaml(docker_compose_file):
-        if docker_compose_file == "/toto/docker-compose.yaml":
-            return {
-                "services": {
-                    "api": {},
-                    "front": {},
-                    "elasticsearch": {},
-                    "worker": {}
-                }
-            }
-        elif docker_compose_file == "/toto/docker-compose.dev.yaml":
-            return {
-                "services": {
-                    "dynalite": {},
-                    "fakes3": {}
-                }
-            }
+    class FakeFile(object):
+        def __init__(self):
+            pass
 
-    mocker.patch("loktar.plugins.dependency.docker_compose.yaml.safe_load", side_effect=fake_yaml)
+        def read(self, *args, **kwargs):
+            return 'version: "2"\n\nservices:\n  redis:\n    image: redis\n\n  elasticsearch:\n    image: elasticsearch:5.0\n\n\n  api:\n    image: api\n\n  worker:\n    image: worker:3.3\n\n  front:\n    build: .\n'
+
+        def __exit__(self, exc_type, exc_val, exc_tb):
+            pass
+
+        def __enter__(self):
+            return self
+
+    def fake_open(*args, **kwargs):
+        return FakeFile()
+
+    mocker.patch("__builtin__.open", return_value=fake_open())
     monkeypatch.setattr("os.listdir", lambda _: ["docker-compose.yaml", "docker-compose.dev.yaml"])
-    assert docker_compose_deps("/toto/") == {"api", "front", "elasticsearch", "worker", "dynalite", "fakes3"}
+    assert docker_compose_deps("/toto/") == {"api", "front", "elasticsearch", "worker", "redis"}

@@ -55,7 +55,7 @@ def example_plugin_bad():
     return Example
 
 
-@pytest.mark.parametrize("package_info", [{"artifact_name": "toto"}, {"artifact_name": "toto", "package_location": "/tmp"}])
+@pytest.mark.parametrize("package_info", [{"artifact_name": "toto"}, {"artifact_name": "toto", "artifact_root_location": "/tmp"}])
 def test_complex_plugin(mocker, example_plugin, package_info):
     mocker.patch("loktar.plugin.lcd")
     mocker.patch("loktar.plugin.exe")

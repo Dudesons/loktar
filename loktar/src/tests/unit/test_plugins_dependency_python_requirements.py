@@ -5,7 +5,7 @@ from loktar.plugins.dependency.python_requirements import python_deps
 
 def test_python_deps(mocker, monkeypatch):
     class FakeFile(object):
-        def __init__(self, *Args, **kwargs):
+        def __init__(self, *args, **kwargs):
             pass
 
         def readlines(self):

@@ -3,8 +3,8 @@ from mock import MagicMock
 import pytest
 from uuid import uuid4
 
-class File(object):
 
+class File(object):
         def __init__(self, name):
             self.filename = name
 

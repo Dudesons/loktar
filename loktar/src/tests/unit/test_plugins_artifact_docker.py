@@ -35,7 +35,7 @@ def test_plugins_docker_quay(mocker, mode, remote, build_type):
     run({
         "artifact_name": "foobar",
         "mode": mode,
-        "package_location": "/tmp",
+        "artifact_root_location": "/tmp",
         "build_info": {
             "registry_type": "quay",
             "build_type": build_type,
@@ -133,9 +133,11 @@ def test_plugins_docker_guay(mocker, mode, status, remote):
         run({
             "artifact_name": "foobar",
             "mode": mode,
-            "package_location": "/tmp",
+            "artifact_root_location": "/tmp",
+            "commit_id": "1dsd1w1dgfdg",
             "build_info": {
                 "registry_type": "guay",
+                "registry_prefix": "my_org_registry",
                 "storage_type": "s3",
             }
         }, remote)
@@ -144,9 +146,11 @@ def test_plugins_docker_guay(mocker, mode, status, remote):
             run({
                 "artifact_name": "foobar",
                 "mode": mode,
-                "package_location": "/tmp",
+                "artifact_root_location": "/tmp",
+                "commit_id": "1dsd1w1dgfdg",
                 "build_info": {
                     "registry_type": "guay",
+                    "registry_prefix": "my_org_registry",
                     "storage_type": "s3",
                 }
             }, remote)
@@ -169,7 +173,7 @@ def test_plugins_docker_fail_on_init(mocker, mode, remote):
         run({
             "artifact_name": "foobar",
             "mode": mode,
-            "package_location": "/tmp",
+            "artifact_root_location": "/tmp",
             "build_info": {
                 "registry_type": "best registry for ever",
             }
@@ -193,7 +197,7 @@ def test_plugins_docker_fail_on_create_archive(mocker, mode, remote, build_type)
             run({
                 "artifact_name": "foobar",
                 "mode": mode,
-                "package_location": "/tmp",
+                "artifact_root_location": "/tmp",
                 "build_info": {
                     "registry_type": "quay",
                     "build_type": build_type,
@@ -206,9 +210,10 @@ def test_plugins_docker_fail_on_create_archive(mocker, mode, remote, build_type)
             run({
                 "artifact_name": "foobar",
                 "mode": mode,
-                "package_location": "/tmp",
+                "artifact_root_location": "/tmp",
                 "build_info": {
                     "registry_type": "guay",
+                    "registry_prefix": "my_org_registry",
                     "storge_type": "s3",
                 }
             }, remote)
@@ -216,7 +221,7 @@ def test_plugins_docker_fail_on_create_archive(mocker, mode, remote, build_type)
         run({
             "artifact_name": "foobar",
             "mode": mode,
-            "package_location": "/tmp",
+            "artifact_root_location": "/tmp",
             "build_info": {
                 "registry_type": "quay",
                 "build_type": build_type,
@@ -239,7 +244,7 @@ def test_plugins_docker_fail_on_trigger_build(mocker, mode, remote):
         run({
             "artifact_name": "foobar",
             "mode": mode,
-            "package_location": "/tmp",
+            "artifact_root_location": "/tmp",
             "build_info": {
                 "registry_type": "quay",
                 "build_type": "wtf_trigger",
@@ -288,7 +293,7 @@ def test_plugins_docker_fail_on_wait_build(mocker, mode, remote, build_type):
         run({
             "artifact_name": "foobar",
             "mode": mode,
-            "package_location": "/tmp",
+            "artifact_root_location": "/tmp",
             "build_info": {
                 "registry_type": "quay",
                 "build_type": build_type,

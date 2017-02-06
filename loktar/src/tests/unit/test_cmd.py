@@ -1,7 +1,9 @@
+from mock import MagicMock
 import pytest
 
 from loktar.cmd import exe
 from loktar.cmd import exec_command_with_retry
+from loktar.cmd import transfer_file
 
 
 class FakeFabricFail(object):
@@ -60,3 +62,14 @@ def test_exec_with_retry_fail(mocker, remote):
     mocker.patch("loktar.cmd.run", return_value=FakeFabricFail())
 
     assert exec_command_with_retry("ls -la", remote, 2) is False
+
+
+@pytest.mark.parametrize('r_failed', [True, False])
+@pytest.mark.parametrize('action', ['GET', 'PUSH', 'other'])
+def test_transfer_file(mocker, r_failed, action):
+    response = MagicMock(failed=r_failed)
+    mocker.patch("loktar.cmd.get", return_value=response)
+    mocker.patch("loktar.cmd.put", return_value=response)
+
+    assert transfer_file(action, 'remote_path', 'local_path') != r_failed or action == 'other'
+    assert not transfer_file(action)

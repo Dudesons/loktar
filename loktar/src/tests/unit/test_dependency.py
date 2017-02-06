@@ -187,7 +187,7 @@ def test_get_do_not_touch_artifacts(include_root, rebuild):
 
             self.head = SHA()
 
-    id_pr = 'id_pr'
+    id_pr = 42
 
     scm = MagicMock()
     if include_root:
@@ -235,13 +235,3 @@ def test_get_do_not_touch_artifacts(include_root, rebuild):
         assert do_not_touch_artifact == {'A', 'B', 'C', 'D'}
     else:
         assert do_not_touch_artifact == set()
-
-
-# def test_pull_request_information(mocker):
-#     mocker.patch('loktar.dependency.Github')
-#     mocker.patch('loktar.dependency.fetch_github_file')
-#     mocker.patch('loktar.dependency.json')
-#     mocker.patch('loktar.dependency.gen_dependencies_level', return_value=(True, ['lala']), autospec=True)
-#     pull_request_information(0, 'workspace')
-#     with pytest.raises(ValueError):
-#         pull_request_information(None, 'workspace')
