@@ -13,15 +13,15 @@ def run(*args, **kwargs):
 
 
 class Make(SimplePlugin):
-        def __init__(self, package_info, remote):
+        def __init__(self, artifact_info, remote):
             """Plugin for launching test from a make file with make ci & make clean
 
                 Args:
-                    package_info (dict): Contains information about the package to execute inside the plugin
+                    artifact_info (dict): Contains information about the package to execute inside the plugin
                     remote (bool): Define if the plugin will be execute in remote or not
 
             """
-            SimplePlugin.__init__(self, package_info,
+            SimplePlugin.__init__(self, artifact_info,
                                   {
                                       "command": {
                                           "run": "make ci",
