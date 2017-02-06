@@ -51,7 +51,7 @@ def strategy_runner(package, run_type, remote=False, **kwargs):
             raise params["exception"](str(e))
 
     elif run_type == "dependency":
-        dependencies = set(package["depends_on"])
+        dependencies = set(package.get("depends_on", []))
 
         for plugin_type in package["dependencies_type"]:
             try:
