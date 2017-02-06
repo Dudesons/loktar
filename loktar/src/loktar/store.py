@@ -6,7 +6,7 @@ from loktar.exceptions import UnknownStorageMethod
 
 
 @retry
-def _store_artifact_on_s3(target, aws_region, aws_bucket):
+def _store_artifact_on_s3(target, aws_region, aws_bucket, prefix_key_name=None):
     """Store an artifact on aws s3
 
     Args:
@@ -16,12 +16,16 @@ def _store_artifact_on_s3(target, aws_region, aws_bucket):
             can be set at None
         aws_bucket (str, None): this is the bucket name where the artifact will be stored
             aws_bucket can be set by a variable environment AWS_BUCKET, this variable it takes in first if it set
+        prefix_key_name (str, None): This is a prefix key name in s3 for an object
+            (eg: the bucket name is foo you want to store in bar the archive
+            so prefix_key_name=bar to store in the foo bucket in the directory bar)
 
 
     Returns
         A string who debribes the artifact (eg: s3:@:foobar foobar here is the artifact name)
     """
-    key_name = target.split("/")[-1]
+    key_name = target.split("/")[-1] if prefix_key_name is None else "{}/{}".format(prefix_key_name,
+                                                                                    target.split("/")[-1])
     connexion = s3.connect_to_region(AWS["REGION"] if AWS["REGION"] is not None else aws_region)
     bucket = connexion.get_bucket(AWS["BUCKET"] if AWS["BUCKET"] is not None else aws_bucket)
     key = bucket.new_key(key_name)
@@ -42,7 +46,9 @@ def store_artifact(store_type, target, **kwargs):
         A string who begin with the method for get back the artifact and the artifact name (eg: s3:@:foobar)
     """
     if store_type == "s3":
-        return _store_artifact_on_s3(target, kwargs.get("aws_region", None), kwargs.get("aws_bucket", None))
+        return _store_artifact_on_s3(target, kwargs.get("aws_region", None),
+                                     kwargs.get("aws_bucket", None),
+                                     prefix_key_name=kwargs.get("prefix_key_name", None))
     else:
         raise UnknownStorageMethod("The storage: {} is unknown, open a PR for supporting the is storage"
                                    .format(store_type))
