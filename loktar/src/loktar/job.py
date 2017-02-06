@@ -305,7 +305,7 @@ def build_params_to_context(package, type_build):
     Returns:
         str: Message to use in Github status.
     """
-    return ('{package} ({type_build})'
+    return ('{package} - {type_build}'
             .format(package=package, type_build=type_build))
 
 
@@ -321,7 +321,7 @@ def context_to_build_params(context):
     Raises:
         ValueError: Could not decode context
     """
-    regex = re.compile('([\w\s-]+) \(([\w\s-]+)\)')
+    regex = re.compile('([\w\s-]+) -? ([\w\s-]+)')
     groups = regex.findall(context)
     if not groups or len(groups[0]) != 2:
         raise ValueError('Could not decode context: "{0}". Regex groups: {1}'.format(context, groups))
