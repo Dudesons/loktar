@@ -111,7 +111,7 @@ class _Guay(ComplexPlugin):
 
         """
         archive_name = str(uuid4()) + ".tar.xz"
-        compress_command = "tar Jcvf  {} *".format(archive_name)
+        compress_command = "touch {0} && tar Jcvf  {0} . --exclude={0}".format(archive_name)
         with self.cwd(self.path):
             if not exe(compress_command, remote=self.remote):
                 raise CIBuildPackageFail("the command : {} executed in the directory {} return False"
@@ -130,7 +130,8 @@ class _Guay(ComplexPlugin):
 
         try:
             artifact_ref = store_artifact(self.artifact_info["build_info"]["storage_type"],
-                                          self.share_memory["archive_for_build"])
+                                          self.share_memory["archive_for_build"],
+                                          prefix_key_name="guay_archives")
         except (SwaggerError, SwaggerSchemaError, SwaggerValidationError, HTTPError) as e:
             raise GuayError(str(e))
 
@@ -194,15 +195,22 @@ class _Guay(ComplexPlugin):
                 raise CIBuildPackageFail(str(e))
 
             self.logger.info("build_id={} build_status={}".format(build_status.build_id, build_status.status))
-            if len(build_status.content) > log_position:
-                for log_index in xrange(log_position, len(build_status.content)):
-                    self.logger.info(build_status.content[log_index])
+
+            if "pushing" in build_status.status:
+                content_to_display = build_status.push_log
+                log_position = 0
+            else:
+                content_to_display = build_status.build_log
+
+            if len(content_to_display) > log_position:
+                for log_index in xrange(log_position, len(content_to_display)):
+                    self.logger.info(content_to_display[log_index])
 
             if build_status.status == "success":
                 build_result = True
                 break
 
-            if "faillure" in build_status.status:
+            if "failure" in build_status.status:
                 build_result = False
                 break
 
