@@ -8,6 +8,7 @@ import networkx as nx
 import numpy as np
 import os
 import time
+import re
 
 from loktar.constants import DEPENDENDY_GRAPH
 from loktar.exceptions import CIJobFail
@@ -80,10 +81,10 @@ def artifact_from_path(path, artifacts):
     Returns:
         the artifact name or None if the path is not inside an artifact
     """
+    paths = path.split('/')
+
     for artifact_name, config in artifacts.iteritems():
-        if "artifact_dir" in config and path.startswith(os.path.join(config["artifact_dir"], artifact_name)):
-            return artifact_name
-        elif path.startswith(artifact_name):
+        if any([p == artifact_name for p in paths]):
             return artifact_name
 
 
