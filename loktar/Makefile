@@ -79,6 +79,9 @@ install: clean
 	python setup.py install
 
 shell:
+	docker-compose run --no-deps loktar bash
+
+shell-with-services:
 	docker-compose run loktar bash
 
 build:
