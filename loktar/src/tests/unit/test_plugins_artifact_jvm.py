@@ -1,7 +1,7 @@
 import pytest
 
 from loktar.exceptions import CIBuildPackageFail
-from loktar.exceptions import CITestFail
+from loktar.plugins.artifact.jvm import _Maven
 from loktar.plugins.artifact.jvm import JVM
 from loktar.plugins.artifact.jvm import run
 
@@ -22,12 +22,14 @@ def ci_payload():
 
 @pytest.mark.parametrize("remote", [True, False])
 @pytest.mark.parametrize("mode", ["master", "foobranch"])
-def test_plugins_jvm(mocker, remote, ci_payload, mode):
+@pytest.mark.parametrize("build_type", ["sbt", "maven"])
+def test_plugins_jvm(mocker, remote, ci_payload, mode, build_type):
     mocker.patch("loktar.plugin.exe")
     mocker.patch("loktar.plugins.artifact.jvm.exec_with_output_capture",
-                 return_value=(True, "build.sbt\nnoob.sala\npython_is_better_than.sala"))
+                 return_value=(True, "build.sbt\nnoob.scala\npython_is_better_than.scala"))
 
     ci_payload["mode"] = mode
+    ci_payload["build_info"]["build_type"] = build_type
 
     run(ci_payload, remote)
 
@@ -37,7 +39,7 @@ def test_plugins_jvm(mocker, remote, ci_payload, mode):
 def test_plugins_jvm_fail_on_command(mocker, remote, ci_payload, mode):
     mocker.patch("loktar.plugin.exe", return_value=False)
     mocker.patch("loktar.plugins.artifact.jvm.exec_with_output_capture",
-                 return_value=(False, "build.sbt\nnoob.sala\npython_is_better_than.sala"))
+                 return_value=(False, "build.sbt\nnoob.scala\npython_is_better_than.scala"))
 
     ci_payload["mode"] = mode
 
@@ -55,7 +57,7 @@ def test_plugins_jvm_fail_on_call():
 def test_plugins_jvm_fail_on_input_type(mocker, remote, ci_payload):
     mocker.patch("loktar.plugin.exe")
     mocker.patch("loktar.plugins.artifact.jvm.exec_with_output_capture",
-                 return_value=(True, "build.sbt\nnoob.sala\npython_is_better_than.sala"))
+                 return_value=(True, "build.sbt\nnoob.scala\npython_is_better_than.scala"))
 
     input_type = "the new and awesome input type"
     ci_payload["build_info"]["build_type"] = input_type
@@ -63,3 +65,16 @@ def test_plugins_jvm_fail_on_input_type(mocker, remote, ci_payload):
         run(ci_payload, remote)
         assert str(excinfo) == "the input type : '{}' is not managed, create a pr for integrate this input type"\
                                .format(input_type)
+
+
+@pytest.mark.parametrize("remote", [True, False])
+@pytest.mark.parametrize("mode", ["master", "foobranch"])
+def test_plugins_maven_commands(ci_payload, remote, mode):
+    ci_payload["mode"] = mode
+
+    mvn = _Maven(ci_payload, remote)
+
+    if mode == "master":
+        assert mvn.config["command"]["run"] == "docker-compose run bar mvn -DskipTests=true --batch-mode release:prepare release:perform"
+    else:
+        assert mvn.config["command"]["run"] == "docker-compose run bar mvn deploy"
