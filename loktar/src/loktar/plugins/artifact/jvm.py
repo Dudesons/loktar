@@ -1,3 +1,4 @@
+from loktar.cmd import exec_with_output_capture
 from loktar.exceptions import CIBuildPackageFail
 from loktar.plugin import SimplePlugin
 
@@ -47,7 +48,7 @@ class _SBT(SimplePlugin):
                 CIBuildPackageFail: when one of the steps for packaging or uploading the package failed
         """
         if artifact_info["mode"] == "master":
-            sbtcmd = "{} sbt 'release with-defaults'".format(
+            sbtcmd = "{} sbt 'release with-defaults skip-tests'".format(
                 artifact_info["build_info"].get("prefix_command", "")
             )
         else:
@@ -63,6 +64,18 @@ class _SBT(SimplePlugin):
                                   }
                               },
                               remote=remote)
+
+        with self.cwd(self.path):
+            rc, output = exec_with_output_capture("ls", remote=remote)
+            if not rc:
+                raise OSError(output.join("\n"))
+            else:
+                if "build.sbt" not in output:
+                    rc, output = exec_with_output_capture("dirname $(find * -name build.sbt)", remote=remote)
+                    if not rc:
+                        raise CIBuildPackageFail("Can't find build.sbt")
+                    else:
+                        self.path = "{}/{}".format(self.path, output[0])
 
     def run(self):
         self._base_run()

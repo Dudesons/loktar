@@ -46,6 +46,32 @@ def exe(cmd, remote=True):
         return True
 
 
+def exec_with_output_capture(cmd, remote=True):
+    """Execute a command and capture the output
+
+    Args:
+        cmd (str): Command to execute
+        remote (bool): Give the context execution remote (True) or local (False)
+
+    Returns:
+        bool: True if everything went well, False otherwise
+        result (list): The output of the command
+    """
+    if remote:
+        launch = run
+        kwargs = {}
+    else:
+        launch = local
+        kwargs = {"capture": True}
+
+    with settings(warn_only=True):
+        result = launch(cmd, **kwargs)
+        if result.failed:
+            logger.error(result)
+            return False, filter(None, result.split("\n"))
+        return True, filter(None, result.split("\n"))
+
+
 def cwd(path, remote=True):
     mv = lcd if remote is False else cd
     return mv(path)
