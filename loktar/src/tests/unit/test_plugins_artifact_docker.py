@@ -47,7 +47,7 @@ def test_plugins_docker_quay(mocker, mode, remote, build_type):
 
 @pytest.mark.parametrize("mode", ["master", "foobar"])
 @pytest.mark.parametrize("remote", [True, False])
-@pytest.mark.parametrize("status", ["success", "faillure"])
+@pytest.mark.parametrize("status", ["success", "failure"])
 def test_plugins_docker_guay(mocker, mode, status, remote):
     class FakeClient(object):
         def __init__(self):
@@ -97,7 +97,8 @@ def test_plugins_docker_guay(mocker, mode, status, remote):
                                 def __init__(self):
                                     self.build_id = "foo"
                                     self.status = status
-                                    self.content = ["step1", "step2"]
+                                    self.build_log = ["step1", "step2"]
+                                    self.push_log = ["step1", "step2"]
 
                             return Result()
 

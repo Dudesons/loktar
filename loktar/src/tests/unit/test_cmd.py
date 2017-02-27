@@ -1,8 +1,11 @@
 from mock import MagicMock
 import pytest
+from fabric.api import local
 
+from loktar.cmd import cwd
 from loktar.cmd import exe
 from loktar.cmd import exec_command_with_retry
+from loktar.cmd import exec_with_output_capture
 from loktar.cmd import transfer_file
 
 
@@ -30,6 +33,9 @@ class FakeFabricSuccess(object):
     @property
     def succeeded(self):
         return True
+
+    def split(self, _):
+        return ["q", "w", "e"]
 
 
 @pytest.mark.parametrize('remote', [True, False])
@@ -73,3 +79,16 @@ def test_transfer_file(mocker, r_failed, action):
 
     assert transfer_file(action, 'remote_path', 'local_path') != r_failed or action == 'other'
     assert not transfer_file(action)
+
+
+def test_cwd():
+    with cwd("/tmp", remote=False):
+        path = local("pwd", capture=True)
+        assert path == "/tmp"
+
+
+@pytest.mark.parametrize('remote', [True, False])
+def test_exec_with_output_capture(mocker, remote):
+    mocker.patch("loktar.cmd.local", return_value=FakeFabricSuccess())
+    mocker.patch("loktar.cmd.run", return_value=FakeFabricSuccess())
+    exec_with_output_capture("ls /tmp", remote=remote)
