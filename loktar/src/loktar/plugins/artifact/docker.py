@@ -100,8 +100,11 @@ class _Guay(ComplexPlugin):
                 raise GuayError("Image version can't be equal to None")
 
             self.share_memory["latest_version"] = str(int(image_info.latest_version) + 1)
+            self.share_memory["extra_versions"] = self.config.get("extra_versions_release", [])
+
         else:
             self.share_memory["latest_version"] = self.artifact_info["mode"]
+            self.share_memory["extra_versions"] = self.config.get("extra_versions_dev", [])
 
         self.logger.info("The next version for the current artifact is {} on branch {}"
                          .format(self.share_memory["latest_version"], self.artifact_info["mode"]))
@@ -157,15 +160,19 @@ class _Guay(ComplexPlugin):
         external_archive_url = "{}:{}/{}".format(STORAGE_PROXY["host"],
                                                  STORAGE_PROXY["port"],
                                                  self.share_memory["archive_url"])
+
+        build_request = {
+            "commit_id": self.artifact_info["commit_id"],
+            "build_id": "",
+            "image": "{}/{}".format(self.artifact_info["build_info"]["registry_prefix"],
+                                    self.artifact_info["artifact_name"]),
+            "version": self.share_memory["latest_version"],
+            "extra_versions": self.share_memory["extra_versions"],
+            "archive_url": external_archive_url
+        }
+
         try:
-            self.share_memory["build_id"] = self.guay.BUILD.StartBuild(build_request={
-                "commit_id": self.artifact_info["commit_id"],
-                "build_id": "",
-                "image": "{}/{}".format(self.artifact_info["build_info"]["registry_prefix"],
-                                        self.artifact_info["artifact_name"]),
-                "version": self.share_memory["latest_version"],
-                "archive_url": external_archive_url
-            }).result().build_id
+            self.share_memory["build_id"] = self.guay.BUILD.StartBuild(build_request=build_request).result().build_id
         except (SwaggerError, SwaggerSchemaError, SwaggerValidationError, HTTPError) as e:
             raise GuayError(str(e))
 
