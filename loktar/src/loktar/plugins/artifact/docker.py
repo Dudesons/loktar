@@ -100,11 +100,11 @@ class _Guay(ComplexPlugin):
                 raise GuayError("Image version can't be equal to None")
 
             self.share_memory["latest_version"] = str(int(image_info.latest_version) + 1)
-            self.share_memory["extra_versions"] = self.config.get("extra_versions_release", [])
+            self.share_memory["extra_versions"] = self.config["build_info"].get("extra_versions_release", [])
 
         else:
             self.share_memory["latest_version"] = self.artifact_info["mode"]
-            self.share_memory["extra_versions"] = self.config.get("extra_versions_dev", [])
+            self.share_memory["extra_versions"] = self.config["build_info"].get("extra_versions_dev", [])
 
         self.logger.info("The next version for the current artifact is {} on branch {}"
                          .format(self.share_memory["latest_version"], self.artifact_info["mode"]))
