@@ -84,7 +84,7 @@ def artifact_from_path(path, artifacts):
     paths = path.split('/')
 
     for artifact_name, config in artifacts.iteritems():
-        if any([p == artifact_name for p in paths]):
+        if any([p == artifact_name and path.startswith(config.get("artifact_dir", "")) for p in paths]):
             return artifact_name
 
 
