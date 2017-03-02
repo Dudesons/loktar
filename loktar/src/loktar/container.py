@@ -5,6 +5,7 @@ import time
 def start_container(image, environment, ports_settings, docker_endpoint="127.0.0.1:2375", network_mode="bridge"):
     container_infos = dict()
     client = DockerClient(base_url=docker_endpoint)
+    client.login(username="")
     container = client.containers.run(image,
                                       detach=True,
                                       environment=environment,
@@ -24,6 +25,7 @@ def start_container(image, environment, ports_settings, docker_endpoint="127.0.0
 
 def clean_container(container_id, docker_endpoint="127.0.0.1:2375"):
     client = DockerClient(base_url=docker_endpoint)
+    client.login(username="")
     container = client.containers.get(container_id)
     container.kill()
     container.remove()

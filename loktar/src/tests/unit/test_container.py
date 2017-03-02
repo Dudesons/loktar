@@ -46,6 +46,9 @@ class FakeClient(object):
     def __init__(self):
         self.containers = FakeSubCommand()
 
+    def login(self, *args, **kwargs):
+        return True
+
 
 def fake_docker_client():
     return FakeClient()
