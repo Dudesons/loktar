@@ -84,7 +84,12 @@ def artifact_from_path(path, artifacts):
     paths = path.split('/')
 
     for artifact_name, config in artifacts.iteritems():
-        if any([p == artifact_name and path.startswith(config.get("artifact_dir", "")) for p in paths]):
+        pattern0 = "^{}/?{}$".format(config.get("artifact_dir", ""), artifact_name)
+        pattern1 = "^{}/?{}/.*$".format(config.get("artifact_dir", ""), artifact_name)
+        regexp0 = re.compile(pattern0)
+        regexp1 = re.compile(pattern1)
+
+        if any([p == artifact_name and (regexp0.match(path) or regexp1.match(path)) for p in paths]):
             return artifact_name
 
 
