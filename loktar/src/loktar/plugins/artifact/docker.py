@@ -100,11 +100,11 @@ class _Guay(ComplexPlugin):
                 raise GuayError("Image version can't be equal to None")
 
             self.share_memory["latest_version"] = str(int(image_info.latest_version) + 1)
-            self.share_memory["extra_versions"] = self.config["build_info"].get("extra_versions_release", [])
+            self.share_memory["extra_versions"] = [item.encode("ascii") for item in self.artifact_info["build_info"].get("extra_versions_release", [])]
 
         else:
             self.share_memory["latest_version"] = self.artifact_info["mode"]
-            self.share_memory["extra_versions"] = self.config["build_info"].get("extra_versions_dev", [])
+            self.share_memory["extra_versions"] = [item.encode("ascii") for item in self.artifact_info["build_info"].get("extra_versions_dev", [])]
 
         self.logger.info("The next version for the current artifact is {} on branch {}"
                          .format(self.share_memory["latest_version"], self.artifact_info["mode"]))
@@ -171,6 +171,8 @@ class _Guay(ComplexPlugin):
             "archive_url": external_archive_url
         }
 
+        self.logger.info("build_request parameters: {}".format(str(build_request)))
+
         try:
             self.share_memory["build_id"] = self.guay.BUILD.StartBuild(build_request=build_request).result().build_id
         except (SwaggerError, SwaggerSchemaError, SwaggerValidationError, HTTPError) as e:
@@ -212,6 +214,8 @@ class _Guay(ComplexPlugin):
             if len(content_to_display) > log_position:
                 for log_index in xrange(log_position, len(content_to_display)):
                     self.logger.info(content_to_display[log_index])
+
+                log_position = len(content_to_display)
 
             if build_status.status == "success":
                 build_result = True
