@@ -218,10 +218,12 @@ class _Guay(ComplexPlugin):
                 log_position = len(content_to_display)
 
             if build_status.status == "success":
+                self.logger.info("Build success detected")
                 build_result = True
                 break
 
             if "failure" in build_status.status:
+                self.logger.info("Build failure detected")
                 build_result = False
                 break
 
