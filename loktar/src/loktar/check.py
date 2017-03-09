@@ -6,6 +6,7 @@ from boto.rds import connect_to_region as rds_connect_to_region
 from boto.s3 import connect_to_region as s3_connect_to_region
 from boto.sqs import connect_to_region as sqs_connect_to_region
 from boto.sqs.regioninfo import SQSRegionInfo
+import docker
 from etcd import Client as EtcdClient
 from etcd import EtcdException
 from etcd import EtcdConnectionFailed
@@ -360,5 +361,42 @@ def wait_http_services(host="localhost", port=80, retries=30, sleep=10, secure=F
             logger.info("health status: {}".format(health))
 
     logger.error("Cannot connect to service {}.".format(kwargs.get("service_name") or 'UNNAMED'))
+    logger.error("Aborting")
+    return False
+
+
+def wait_docker_container(docker_client, container_id, retries=30, sleep=10):
+    """Wait for a container is available.
+
+    Args:
+        docker_client (DockerClient): the docker client.
+        container_id (str): the container id target.
+        retries (int): Maximum number of retries. Defaults to 30.
+        sleep (int): Time of sleep between retries, in seconds. Defaults to 10 seconds.
+    Returns:
+       bool: True if it is ready, False if something went wrong
+
+    """
+    for i in range(0, retries):
+        try:
+            container = docker_client.containers.get(container_id)
+        except (docker.errors.ContainerError, docker.errors.ImageNotFound, docker.errors.APIError) as e:
+            logger.error(str(e))
+            return False
+
+        if container.status == "running":
+            logger.info("The container is running".format(container.status, container_id))
+            return True
+        elif container.status in ["dead", "exited", "removing"]:
+            logger.error("The container have a problem, status={}, container_id={}".format(container.status,
+                                                                                           container_id))
+            return False
+        else:
+            logger.warning("The container is not yet up, status={}, container_id={}".format(container.status,
+                                                                                            container_id))
+            time.sleep(sleep)
+            continue
+
+    logger.error("The container can't start, status={}, container_id={}".format(container.status, container_id))
     logger.error("Aborting")
     return False
