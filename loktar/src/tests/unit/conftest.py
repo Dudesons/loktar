@@ -178,3 +178,64 @@ class FakeElasticSearch(object):
             u'took': 89,
             u'timed_out': False
         }
+
+
+class FakeContainer(object):
+    def __init__(self, *args, **kwargs):
+        self.attrs = {
+            "NetworkSettings": {
+                "Ports": {
+                    "net0": [{"HostPort": 2222}, {}]
+
+                }
+            },
+            "Node": {
+                "IP": "127.0.0.1"
+            }
+        }
+        self.id = "qwertyuiop"
+        self.status = kwargs.get("container_status", "running")
+
+    def kill(self):
+        pass
+
+    def remove(self):
+        pass
+
+    def start(self):
+        pass
+
+
+class FakeSubCommandContainers(object):
+    def __init__(self, *args, **kwargs):
+        self.args = args
+        self.kwargs = kwargs
+
+    def run(self, *args, **kwargs):
+        return FakeContainer(*self.args, **self.kwargs)
+
+    def get(self, *args, **kwargs):
+        return FakeContainer(*self.args, **self.kwargs)
+
+
+class FakeSubCommandImages(object):
+    def __init__(self, *args, **kwargs):
+        self.arg = args
+        self.kwarg = kwargs
+
+    def pull(self, *args, **kwargs):
+        pass
+
+
+class FakeClient(object):
+    def __init__(self, *args, **kwargs):
+        self.containers = FakeSubCommandContainers(*args, **kwargs)
+        self.images = FakeSubCommandImages(*args, **kwargs)
+
+    def login(self, *args, **kwargs):
+        return True
+
+
+@pytest.fixture
+def fake_docker_client():
+    return FakeClient

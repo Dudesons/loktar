@@ -5,6 +5,7 @@ import paramiko
 import requests
 import socket
 
+from loktar.check import wait_docker_container
 from loktar.check import wait_dynamodb
 from loktar.check import wait_elasticsearch
 from loktar.check import wait_etcd
@@ -245,6 +246,7 @@ def test_wait_rds(mocker, fail):
     else:
         assert wait_rds() is True
 
+
 @pytest.mark.parametrize("fail", [True, False])
 def test_http_services(monkeypatch, fail):
     class FakeAPI(object):
@@ -271,3 +273,13 @@ def test_http_services(monkeypatch, fail):
         assert is_ready is False
     else:
         assert is_ready is True
+
+
+@pytest.mark.parametrize("fail", [True, False])
+def test_wait_docker_container(fail, fake_docker_client):
+    client = fake_docker_client(container_status="dead" if fail else "running")
+
+    if fail:
+        assert wait_docker_container(client, "", retries=1, sleep=0.1) is False
+    else:
+        assert wait_docker_container(client, "", retries=1, sleep=0.1) is True
