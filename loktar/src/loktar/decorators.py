@@ -3,7 +3,7 @@ from __future__ import division
 import random
 import time
 
-from loktar.constants import RETRY_HTTP
+from loktar.constants import RETRY
 from loktar.log import Log
 
 
@@ -21,11 +21,11 @@ def retry(call):
         """Fake doc"""
         logger = Log()
         last_exception = None
-        multiplier = RETRY_HTTP["multiplier"]
-        retry_interval = RETRY_HTTP["interval"]
-        randomization_factor = RETRY_HTTP["randomization_factor"]
+        multiplier = RETRY["multiplier"]
+        retry_interval = RETRY["interval"]
+        randomization_factor = RETRY["randomization_factor"]
         total_sleep_time = 0
-        max_sleep_time = RETRY_HTTP["max_sleep_time"]
+        max_sleep_time = RETRY["max_sleep_time"]
 
         request_nb = 0
         # Capped to 20 minutes

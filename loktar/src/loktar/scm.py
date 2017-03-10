@@ -272,6 +272,7 @@ class Github(object):
         return [f.filename for f in self.get_commit(commit_id).files]
 
 
+@retry
 def fetch_github_file(url, token):
     """Fetch a file from GitHub
 

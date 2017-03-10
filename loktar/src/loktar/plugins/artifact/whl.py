@@ -3,6 +3,7 @@ from pypicloud_client.client import PypicloudClient
 from loktar.cmd import exe
 from loktar.cmd import exec_command_with_retry
 from loktar.constants import MAX_RETRY_PYTHON_UPLOAD
+from loktar.decorators import retry
 from loktar.exceptions import CIBuildPackageFail
 from loktar.plugin import ComplexPlugin
 
@@ -80,6 +81,7 @@ class Whl(ComplexPlugin):
                 self.share_memory["latest_version"] = "0.{0}".format(self.artifact_info["mode"])
                 self.pypicloud.delete_package(self.artifact_info["artifact_name"], self.share_memory["latest_version"])
 
+        @retry
         def release(self):
             """Create & upload the package
 

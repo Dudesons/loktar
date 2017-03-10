@@ -104,11 +104,11 @@ QUAY = {
     "limit": getenv("LOKTAR_QUAY_LIMIT", type=int, default=100)
 }
 
-RETRY_HTTP = {
-    "multiplier": getenv("LOKTAR_RETRY_HTTP_MULTIPLIER", type=float, default=1.5),
-    "interval": getenv("LOKTAR_RETRY_HTTP_INTERVAL", type=float, default=0.5),
-    "randomization_factor": getenv("LOKTAR_RETRY_HTTP_RANDOMIZATION_FACTOR", type=float, default=0.5),
-    "max_sleep_time": getenv("LOKTAR_RETRY_HTTP_MAX_SLEEP_TIME", type=float, default=180)
+RETRY = {
+    "multiplier": getenv("LOKTAR_RETRY_MULTIPLIER", type=float, default=1.5),
+    "interval": getenv("LOKTAR_RETRY_INTERVAL", type=float, default=0.5),
+    "randomization_factor": getenv("LOKTAR_RETRY_RANDOMIZATION_FACTOR", type=float, default=0.5),
+    "max_sleep_time": getenv("LOKTAR_RETRY_MAX_SLEEP_TIME", type=float, default=180)
 }
 
 STORAGE_PROXY = {

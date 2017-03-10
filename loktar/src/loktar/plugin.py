@@ -6,6 +6,7 @@ import sys
 
 from loktar.cmd import exe
 from loktar.constants import ROOT_PATH
+from loktar.decorators import retry
 from loktar.exceptions import CITestFail
 from loktar.exceptions import ForbiddenTimelineKey
 from loktar.exceptions import ImportPluginError
@@ -53,6 +54,7 @@ class SimplePlugin(object):
             raise SimplePluginErrorConfiguration("The simple plugin configuration is incompleted,"
                                                  " check if run & clean keys are filled")
 
+    @retry
     def __command(self, cmd):
         """Run the command indicated in the yaml file in the package directory
 
