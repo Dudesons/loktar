@@ -38,6 +38,26 @@ class FakeFabricSuccess(object):
         return ["q", "w", "e"]
 
 
+class FakeFabric(object):
+    def __init__(self, rc, *args, **kwargs):
+        self.rc = rc
+
+    @property
+    def failed(self):
+        return self.rc
+
+    @property
+    def succeeded(self):
+        return self.rc
+
+    def split(self, _):
+        return ["q", "w", "e"]
+
+
+@pytest.fixture
+def fake_fabric():
+    return FakeFabric
+
 @pytest.mark.parametrize('remote', [True, False])
 def test_exe(mocker, remote):
     mocker.patch("loktar.cmd.local", return_value=FakeFabricSuccess())
@@ -55,11 +75,31 @@ def test_exe_fail(mocker, remote):
 
 
 @pytest.mark.parametrize('remote', [True, False])
+@pytest.mark.parametrize('force_return_code', [True, False])
+def test_exe_force_return_code(mocker, fake_fabric, remote, force_return_code):
+    fabric_object = fake_fabric(force_return_code)
+    mocker.patch("loktar.cmd.local", return_value=fabric_object)
+    mocker.patch("loktar.cmd.run", return_value=fabric_object)
+
+    assert exe("ls -la", remote=remote, force_return_code=force_return_code) is force_return_code
+
+
+@pytest.mark.parametrize('remote', [True, False])
 def test_exec_with_retry(mocker, remote):
     mocker.patch("loktar.cmd.local", return_value=FakeFabricSuccess())
     mocker.patch("loktar.cmd.run", return_value=FakeFabricSuccess())
 
     assert exec_command_with_retry("ls -la", remote, 2) is True
+
+
+@pytest.mark.parametrize('remote', [True, False])
+@pytest.mark.parametrize('force_return_code', [True, False])
+def test_exec_with_retry_force_return_code(mocker, fake_fabric, remote, force_return_code):
+    fabric_object = fake_fabric(force_return_code)
+    mocker.patch("loktar.cmd.local", return_value=fabric_object)
+    mocker.patch("loktar.cmd.run", return_value=fabric_object)
+
+    assert exec_command_with_retry("ls -la", remote, 2, force_return_code=force_return_code) is force_return_code
 
 
 @pytest.mark.parametrize('remote', [True, False])
@@ -91,4 +131,15 @@ def test_cwd():
 def test_exec_with_output_capture(mocker, remote):
     mocker.patch("loktar.cmd.local", return_value=FakeFabricSuccess())
     mocker.patch("loktar.cmd.run", return_value=FakeFabricSuccess())
+    exec_with_output_capture("ls /tmp", remote=remote)
+
+
+@pytest.mark.parametrize('force_return_code', [True, False])
+@pytest.mark.parametrize('remote', [True, False])
+def test_exec_with_output_capture_force_return_code(mocker, fake_fabric, remote, force_return_code):
+    fabric_object = fake_fabric(force_return_code)
+
+    mocker.patch("loktar.cmd.local", return_value=fabric_object)
+    mocker.patch("loktar.cmd.run", return_value=fabric_object)
+
     exec_with_output_capture("ls /tmp", remote=remote)
