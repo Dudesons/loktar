@@ -93,6 +93,7 @@ AWS = {
 PLUGINS_INFO = {
     "locations": getenv("LOKTAR_PLUGINS_LOCATIONS", type=list, default=[]),
     "workspace": getenv("LOKTAR_PLUGINS_WORKSPACE", type=str, default=None),
+    "clean_exit_code": getenv("LOKTAR_PLUGINS_CLEAN_EXIT_CODE", type=bool, default=None)
 }
 
 SLACK = {
