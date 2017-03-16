@@ -1,8 +1,6 @@
 from pypicloud_client.client import PypicloudClient
 
 from loktar.cmd import exe
-from loktar.cmd import exec_command_with_retry
-from loktar.constants import MAX_RETRY_PYTHON_UPLOAD
 from loktar.decorators import retry
 from loktar.exceptions import CIBuildPackageFail
 from loktar.plugin import ComplexPlugin
@@ -93,7 +91,7 @@ class Whl(ComplexPlugin):
                     raise CIBuildPackageFail("Failed to update the version")
 
                 # Build package
-                if not exec_command_with_retry("make release", max_retry=MAX_RETRY_PYTHON_UPLOAD, remote=self.remote):
+                if not exe("make release", remote=self.remote):
                     raise CIBuildPackageFail("Release failed for the wheel package")
 
                 self.logger.info("Wheel package built & uploaded")
