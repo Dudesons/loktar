@@ -11,28 +11,35 @@ from loktar.log import Log
 logger = Log()
 
 
-def exec_command_with_retry(cmd, remote, max_retry):
-    """Execute and retry a command"""
+def exec_command_with_retry(cmd, remote, max_retry, force_return_code=None):
+    """Execute and retry a command
+    Args:
+        cmd (str): Command to execute
+        remote (bool): Give the context execution remote (True) or local (False)
+        max_retry (int): THe number or command to execute before returning error
+        force_return_code (bool): Force the return code, ignoring if the command is success or failure
+    """
     with settings(warn_only=True):
         id_try = 0
         launch = local if remote == 0 else run
         while id_try < max_retry:
             result = launch(cmd)
             if result.succeeded:
-                return True
+                return True if force_return_code is None else force_return_code
             else:
                 id_try += 1
 
         logger.error("The command : {0} failed after {1} retries".format(cmd, max_retry))
-        return False
+        return False if force_return_code is None else force_return_code
 
 
-def exe(cmd, remote=True):
+def exe(cmd, remote=True, force_return_code=None):
     """Execute a command
 
     Args:
         cmd (str): Command to execute
         remote (bool): Give the context execution remote (True) or local (False)
+        force_return_code (bool): Force the return code, ignoring if the command is success or failure
 
     Returns:
         bool: True if everything went well, False otherwise
@@ -42,16 +49,17 @@ def exe(cmd, remote=True):
         result = launch(cmd)
         if result.failed:
             logger.error(result)
-            return False
-        return True
+            return False if force_return_code is None else force_return_code
+        return True if force_return_code is None else force_return_code
 
 
-def exec_with_output_capture(cmd, remote=True):
+def exec_with_output_capture(cmd, remote=True, force_return_code=None):
     """Execute a command and capture the output
 
     Args:
         cmd (str): Command to execute
         remote (bool): Give the context execution remote (True) or local (False)
+        force_return_code (bool): Force the return code, ignoring if the command is success or failure
 
     Returns:
         bool: True if everything went well, False otherwise
@@ -68,8 +76,8 @@ def exec_with_output_capture(cmd, remote=True):
         result = launch(cmd, **kwargs)
         if result.failed:
             logger.error(result)
-            return False, filter(None, result.split("\n"))
-        return True, filter(None, result.split("\n"))
+            return False if force_return_code is None else force_return_code, filter(None, result.split("\n"))
+        return True if force_return_code is None else force_return_code, filter(None, result.split("\n"))
 
 
 def cwd(path, remote=True):

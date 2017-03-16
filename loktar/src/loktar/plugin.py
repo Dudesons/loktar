@@ -5,6 +5,7 @@ import importlib
 import sys
 
 from loktar.cmd import exe
+from loktar.constants import PLUGINS_INFO
 from loktar.constants import ROOT_PATH
 from loktar.decorators import retry
 from loktar.exceptions import CITestFail
@@ -30,6 +31,7 @@ class SimplePlugin(object):
         self.remote = kwargs.get("remote", False)
         self.artifact_info = artifact_info
         self.cwd = lcd if self.remote is False else cd
+        self.exit_code_on_clean_method = PLUGINS_INFO["clean_exit_code"]
 
         root_location = artifact_info["artifact_root_location"] if "artifact_root_location" in artifact_info else ROOT_PATH["container"]
 
@@ -54,9 +56,11 @@ class SimplePlugin(object):
             raise SimplePluginErrorConfiguration("The simple plugin configuration is incompleted,"
                                                  " check if run & clean keys are filled")
 
-    @retry
-    def __command(self, cmd):
+    def __command(self, cmd, force_return_code=None):
         """Run the command indicated in the yaml file in the package directory
+            Args:
+                cmd (str): the command that be executed
+                force_return_code (bool): Force the return code if necessary
 
             Raise:
                 CITestFail: An error occurred when the test failed
@@ -64,7 +68,7 @@ class SimplePlugin(object):
         if cmd != "" and cmd is not None:
             with self.cwd(self.path):
                 with settings(warn_only=True):
-                    if not exe(cmd, remote=self.remote):
+                    if not exe(cmd, remote=self.remote, force_return_code=force_return_code):
                         raise CITestFail("Test failed, on command: {}, remote: {}".format(cmd, self.remote))
 
     def _base_run(self):
@@ -75,7 +79,7 @@ class SimplePlugin(object):
             raise
 
     def _base_clean(self):
-        self.__command(self.config["command"]["clean"])
+        self.__command(self.config["command"]["clean"], force_return_code=self.exit_code_on_clean_method)
 
 
 class ComplexPlugin(SimplePlugin):
