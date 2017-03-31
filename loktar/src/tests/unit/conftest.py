@@ -5,59 +5,59 @@ from uuid import uuid4
 
 
 class File(object):
-        def __init__(self, name):
-            self.filename = name
+    def __init__(self, name):
+        self.filename = name
 
 
 class Commit(object):
-        files = [File("toto"), File("toto"), File("lulu")]
-        sha = 'sha'
+    files = [File("toto"), File("toto"), File("lulu")]
+    sha = 'sha'
 
-        def __init__(self, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
 
-            class Commit_(object):
-                message = 'message'
+        class Commit_(object):
+            message = 'message'
 
-            self.commit = Commit_()
+        self.commit = Commit_()
 
-        def get_statuses(self):
-            return ['status1', 'status2']
+    def get_statuses(self):
+        return ['status1', 'status2']
 
 
 class PullRequestPart(object):
-        ref = 'branch'
-        sha = 'commitsha'
+    ref = 'branch'
+    sha = 'commitsha'
 
 
 class IssueComment(object):
-        body = 'existing comment'
+    body = 'existing comment'
 
 
 class PullRequest(object):
-        head = PullRequestPart()
-        number = 565
+    head = PullRequestPart()
+    number = 565
 
-        def __init__(self, *args, **kwargs):
-            pass
+    def __init__(self, *args, **kwargs):
+        pass
 
-        def get_commits(self):
-            # Mocking a paginated list
-            m = MagicMock(reversed=[Commit(), Commit()])
+    def get_commits(self):
+        # Mocking a paginated list
+        m = MagicMock(reversed=[Commit(), Commit()])
 
-            def one_element():
-                yield Commit()
-                yield Commit()
-            m.__iter__.side_effect = one_element
-            return m
+        def one_element():
+            yield Commit()
+            yield Commit()
+        m.__iter__.side_effect = one_element
+        return m
 
-        def get_issue_comments(self):
-            return [IssueComment()]
+    def get_issue_comments(self):
+        return [IssueComment()]
 
-        def create_issue_comment(self, comment):
-            return comment
+    def create_issue_comment(self, comment):
+        return comment
 
-        def get_files(self):
-            return [File("toto"), File("toto"), File("lulu")]
+    def get_files(self):
+        return [File("toto"), File("toto"), File("lulu")]
 
 
 class Release(object):
@@ -76,42 +76,42 @@ class Release(object):
 
 
 class Repository(object):
-        def __init__(self, fail):
-            self.fail = fail
+    def __init__(self, fail):
+        self.fail = fail
 
-        def get_pulls(self, state=None):
-            return [
-                PullRequest(),
-                PullRequest()
-            ]
+    def get_pulls(self, state=None):
+        return [
+            PullRequest(),
+            PullRequest()
+        ]
 
-        def get_pull(self, state=None):
-            if self.fail["exc"] is False:
-                return PullRequest()
-            else:
-                raise AssertionError
+    def get_pull(self, state=None):
+        if self.fail["exc"] is False:
+            return PullRequest()
+        else:
+            raise AssertionError
 
-        def get_commit(self, sha):
-            if self.fail["exc"] is False:
-                return Commit()
-            else:
-                raise AssertionError
-
-        def commit(self, sha):
+    def get_commit(self, sha):
+        if self.fail["exc"] is False:
             return Commit()
+        else:
+            raise AssertionError
 
-        def create_git_tag_and_release(self, tag_name, tag_message, release_name, patch_note, commit_id, type_object="commit"):
-            return Release(self.fail)
+    def commit(self, sha):
+        return Commit()
+
+    def create_git_tag_and_release(self, tag_name, tag_message, release_name, patch_note, commit_id, type_object="commit"):
+        return Release(self.fail)
 
 
 class FakeGithubRepo(object):
-        def __init__(self, fail):
-            self.fail = fail
+    def __init__(self, fail):
+        self.fail = fail
 
-        def get_organization(self, *args, **kwargs):
-            mock_get_repo = MagicMock()
-            mock_get_repo.get_repo.return_value = Repository(self.fail)
-            return mock_get_repo
+    def get_organization(self, *args, **kwargs):
+        mock_get_repo = MagicMock()
+        mock_get_repo.get_repo.return_value = Repository(self.fail)
+        return mock_get_repo
 
 
 @pytest.fixture
@@ -192,7 +192,14 @@ class FakeContainer(object):
             "Node": {
                 "IP": "127.0.0.1"
             }
-        }
+        } if kwargs.get("swarm_cluster_enable", False) else {
+            "NetworkSettings": {
+                "Ports": {
+                    "net0": [{"HostPort": 2222}, {}]
+
+                }
+            }}
+
         self.id = "qwertyuiop"
         self.status = kwargs.get("container_status", "running")
 

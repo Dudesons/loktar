@@ -14,8 +14,10 @@ def test_start_container(mocker, fake_docker_client):
     assert container_info["id"] == "qwertyuiop"
 
 
-def test_fail_start_container(mocker, fake_docker_client):
-    mocker.patch("loktar.container.DockerClient", return_value=fake_docker_client(container_status="dead"))
+@pytest.mark.parametrize("swarm_cluster_enable", [True, False])
+def test_fail_start_container(mocker, fake_docker_client, swarm_cluster_enable):
+    mocker.patch("loktar.container.DockerClient", return_value=fake_docker_client(container_status="dead",
+                                                                                  swarm_cluster_enable=swarm_cluster_enable))
     with pytest.raises(CIJobFail) as e:
         start_container("foo/bar:1", {"MY_ENV": "KILLER_ENV"}, {"22/tcp": None})
         assert str(e) == "CIJobFail: CIJobFail: Fail to contact the container"

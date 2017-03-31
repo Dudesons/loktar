@@ -1,5 +1,4 @@
 from docker import DockerClient
-import time
 
 from loktar.check import wait_docker_container
 from loktar.exceptions import CIJobFail
@@ -33,7 +32,7 @@ def start_container(image, environment, ports_settings, docker_endpoint="127.0.0
         raise CIJobFail("Fail to contact the container")
 
     container = client.containers.get(container.id)
-    container_infos["host"] = container.attrs["Node"]["IP"]
+    container_infos["host"] = container.attrs["Node"]["IP"] if "Node" in container.attrs else "127.0.0.1"
     container_infos["host_port"] = int(sorted(container.attrs["NetworkSettings"]["Ports"].values(),
                                               reverse=True)[0][0]["HostPort"])
     container_infos["id"] = container.id
