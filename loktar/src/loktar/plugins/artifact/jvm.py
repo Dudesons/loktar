@@ -96,7 +96,7 @@ class _Maven(SimplePlugin):
                 CIBuildPackageFail: when one of the steps for packaging or uploading the package failed
         """
         if artifact_info["mode"] == "master":
-            sbtcmd = "{} mvn -Darguments="-DskipTests" --batch-mode release:prepare release:perform".format(
+            sbtcmd = "{} mvn -Darguments=\"-DskipTests\" --batch-mode release:prepare release:perform".format(
                 artifact_info["build_info"].get("prefix_command", "")
             )
         else:
