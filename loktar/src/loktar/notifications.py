@@ -109,7 +109,7 @@ def send_message_to_slack(message, **kwargs):
 
     try:
         response = slack_client.chat.post_message(
-            SLACK["channel"] if SLACK["channel"] else kwargs.get("channel", None),
+            kwargs.get("channel") if kwargs.get("channel", None) else SLACK["channel"],
             message
         )
 
