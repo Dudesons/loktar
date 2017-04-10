@@ -200,8 +200,10 @@ class _Guay(ComplexPlugin):
         while 42:
             try:
                 build_status = self.guay.BUILD.BuildStatus(build_id=self.share_memory["build_id"]).result()
-            except (SwaggerError, SwaggerSchemaError, SwaggerValidationError, HTTPError) as e:
+            except (SwaggerError, SwaggerSchemaError, SwaggerValidationError) as e:
                 raise CIBuildPackageFail(str(e))
+            except HTTPError as e:
+                self.logger.warning(str(e))
 
             self.logger.info("build_id={} build_status={}".format(build_status.build_id, build_status.status))
 
