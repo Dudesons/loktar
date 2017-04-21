@@ -75,6 +75,6 @@ def test_plugins_maven_commands(ci_payload, remote, mode):
     mvn = _Maven(ci_payload, remote)
 
     if mode == "master":
-        assert mvn.config["command"]["run"] == "docker-compose run bar mvn -DskipTests=true --batch-mode release:prepare release:perform"
+        assert mvn.config["command"]["run"] == "docker-compose run bar mvn -Darguments=\"-DskipTests\" --batch-mode release:prepare release:perform"
     else:
         assert mvn.config["command"]["run"] == "docker-compose run bar mvn deploy"
