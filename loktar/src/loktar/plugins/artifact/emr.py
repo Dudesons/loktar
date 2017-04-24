@@ -67,5 +67,6 @@ class _Jar(SimplePlugin):
 
     def run(self):
         self._base_run()
+        self._base_clean()
         return {
         }
