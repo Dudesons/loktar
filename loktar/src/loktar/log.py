@@ -34,5 +34,5 @@ class Log(object):
         sys.stdout.write("{0}[{1}] {2}{3}\n".format(begin,
                                                     datetime.datetime.now(),
                                                     msg,
-                                                    end))
+                                                    end).encode("utf-8"))
         sys.stdout.flush()
