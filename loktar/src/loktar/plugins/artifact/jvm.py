@@ -100,7 +100,7 @@ class _Maven(SimplePlugin):
                 artifact_info["build_info"].get("prefix_command", "")
             )
         else:
-            sbtcmd = "{} mvn deploy".format(
+            sbtcmd = "{} mvn -DskipTests deploy".format(
                 artifact_info["build_info"].get("prefix_command", "")
             )
 
