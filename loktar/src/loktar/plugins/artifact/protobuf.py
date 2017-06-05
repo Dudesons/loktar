@@ -44,9 +44,8 @@ class Protobuf(ComplexPlugin):
 
         """
         self._run()
-        return {
-            "versions": self.share_memory["latest_versions"]
-        }
+        return {"versions": self.share_memory["latest_versions"]}\
+            if len(self.share_memory["latest_versions"]) > 0 else {}
 
     def launch_sub_project(self):
         """
