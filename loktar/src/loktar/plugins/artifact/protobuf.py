@@ -55,6 +55,7 @@ class Protobuf(ComplexPlugin):
         for artifact_type in self.artifact_info["build_info"]["sub_artifact_types"]:
             sub_artifact_config = deepcopy(self.artifact_info)
             sub_artifact_config["artifact_type"] = artifact_type["type"]
+            sub_artifact_config["build_info"].update(artifact_type)
             result = strategy_runner(sub_artifact_config,
                                      "artifact",
                                      remote=artifact_type["remote"] if "remote" in artifact_type else False)

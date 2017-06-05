@@ -13,7 +13,7 @@ from loktar.plugins.artifact import protobuf
       "type": "library",
       "build_info": {
         "sub_artifact_types": [
-          {"type": "jvm", "remote": True},
+          {"type": "jvm", "remote": True, "build_type": "sbt"},
           {"type": "whl"}
         ]
       },
@@ -32,8 +32,10 @@ def test_plugins_artifact_protobuf(artifact_info, remote):
 
     jvm_protobuf_config = deepcopy(artifact_info)
     jvm_protobuf_config["artifact_type"] = "jvm"
+    jvm_protobuf_config["build_info"].update(artifact_info["build_info"]["sub_artifact_types"][0])
     whl_protobuf_config = deepcopy(artifact_info)
     whl_protobuf_config["artifact_type"] = "whl"
+    whl_protobuf_config["build_info"].update(artifact_info["build_info"]["sub_artifact_types"][1])
 
     flexmock(protobuf) \
         .should_receive("strategy_runner") \
