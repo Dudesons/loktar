@@ -169,7 +169,9 @@ class _Guay(ComplexPlugin):
                                     self.artifact_info["artifact_name"]),
             "version": self.share_memory["latest_version"],
             "extra_versions": self.share_memory["extra_versions"],
-            "archive_url": external_archive_url
+            "archive_url": external_archive_url,
+            "build_args": [{"name": k, "value": v}
+                           for k, v in self.artifact_info["build_info"]["build_args"].iteritems()]
         }
 
         self.logger.info("build_request parameters: {}".format(str(build_request)))
