@@ -54,6 +54,13 @@ class Protobuf(ComplexPlugin):
         for artifact_type in self.artifact_info["build_info"]["sub_artifact_types"]:
             sub_artifact_config = deepcopy(self.artifact_info)
             sub_artifact_config["artifact_type"] = artifact_type["type"]
+
+            if "artifact_name" in artifact_type:
+                sub_artifact_config["artifact_name"] = artifact_type["artifact_name"]
+
+            if "artifact_dir" in artifact_type:
+                sub_artifact_config["artifact_dir"] = artifact_type["artifact_dir"]
+
             sub_artifact_config["build_info"].update(artifact_type)
             result = strategy_runner(sub_artifact_config,
                                      "artifact",
