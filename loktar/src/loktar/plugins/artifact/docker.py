@@ -107,6 +107,7 @@ class _Guay(ComplexPlugin):
             self.share_memory["latest_version"] = self.artifact_info["mode"]
             self.share_memory["extra_versions"] = [item.encode("ascii") for item in self.artifact_info["build_info"].get("extra_versions_dev", [])]
 
+        self.artifact_info["build_info"]["build_args"]["VERSION"] = self.share_memory["latest_version"]
         self.logger.info("The next version for the current artifact is {} on branch {}"
                          .format(self.share_memory["latest_version"], self.artifact_info["mode"]))
 
