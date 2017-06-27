@@ -140,6 +140,9 @@ def test_plugins_docker_guay(mocker, mode, status, remote):
                 "registry_type": "guay",
                 "registry_prefix": "my_org_registry",
                 "storage_type": "s3",
+                "build_args": {
+                    "COMMIT_ID": "commit_id"
+                }
             }
         }, remote)
     else:
@@ -153,6 +156,9 @@ def test_plugins_docker_guay(mocker, mode, status, remote):
                     "registry_type": "guay",
                     "registry_prefix": "my_org_registry",
                     "storage_type": "s3",
+                    "build_args": {
+                        "COMMIT_ID": "commit_id"
+                    }
                 }
             }, remote)
 
@@ -203,7 +209,10 @@ def test_plugins_docker_fail_on_create_archive(mocker, mode, remote, build_type)
                     "registry_type": "quay",
                     "build_type": build_type,
                     "storge_type": "s3",
-                    "trigger_service": "github"
+                    "trigger_service": "github",
+                    "build_args": {
+                        "COMMIT_ID": "commit_id"
+                    }
                 }
             }, remote)
 
@@ -216,6 +225,9 @@ def test_plugins_docker_fail_on_create_archive(mocker, mode, remote, build_type)
                     "registry_type": "guay",
                     "registry_prefix": "my_org_registry",
                     "storge_type": "s3",
+                    "build_args": {
+                        "COMMIT_ID": "commit_id"
+                    }
                 }
             }, remote)
     else:
@@ -227,7 +239,10 @@ def test_plugins_docker_fail_on_create_archive(mocker, mode, remote, build_type)
                 "registry_type": "quay",
                 "build_type": build_type,
                 "storge_type": "s3",
-                "trigger_service": "github"
+                "trigger_service": "github",
+                "build_args": {
+                    "COMMIT_ID": "commit_id"
+                }
             }
         }, remote)
 
@@ -250,7 +265,10 @@ def test_plugins_docker_fail_on_trigger_build(mocker, mode, remote):
                 "registry_type": "quay",
                 "build_type": "wtf_trigger",
                 "storage_type": "s3",
-                "trigger_service": "github"
+                "trigger_service": "github",
+                "build_args": {
+                    "COMMIT_ID": "commit_id"
+                }
             }
         }, remote)
 
@@ -299,7 +317,10 @@ def test_plugins_docker_fail_on_wait_build(mocker, mode, remote, build_type):
                 "registry_type": "quay",
                 "build_type": build_type,
                 "storage_type": "s3",
-                "trigger_service": "github"
+                "trigger_service": "github",
+                "build_args": {
+                    "COMMIT_ID": "commit_id"
+                }
             }
         }, remote)
 
