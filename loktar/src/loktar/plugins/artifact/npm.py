@@ -1,6 +1,7 @@
 import json
 
 from loktar.cmd import exe
+from loktar.cmd import exec_with_output_capture
 from loktar.decorators import retry
 from loktar.exceptions import CIBuildPackageFail
 from loktar.plugin import ComplexPlugin
@@ -42,6 +43,18 @@ class NPM(ComplexPlugin):
                 30: self.build,
                 40: self.release
             }
+
+            with self.cwd(self.path):
+                rc, output = exec_with_output_capture("ls", remote=remote)
+                if not rc:
+                    raise OSError(output.join("\n"))
+                else:
+                    if "package.json" not in output:
+                        rc, output = exec_with_output_capture("dirname $(find * -name build.sbt)", remote=remote)
+                        if not rc:
+                            raise CIBuildPackageFail("Can't find package.json")
+                        else:
+                            self.path = "{}/{}".format(self.path, output[0])
 
         def run(self):
             """Default method for running the timeline
