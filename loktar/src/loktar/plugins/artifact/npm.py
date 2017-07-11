@@ -50,11 +50,11 @@ class NPM(ComplexPlugin):
                     raise OSError(output.join("\n"))
                 else:
                     if "package.json" not in output:
-                        rc, output = exec_with_output_capture("dirname $(find * -name build.sbt)", remote=remote)
+                        rc, output = exec_with_output_capture("dirname $(find * -name package.json)", remote=remote)
                         if not rc:
                             raise CIBuildPackageFail("Can't find package.json")
                         else:
-                            self.path = "{}/{}".format(self.path, output[0])
+                            self.path = "{}/{}/".format(self.path, output[0])
 
         def run(self):
             """Default method for running the timeline
